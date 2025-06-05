@@ -1,3 +1,5 @@
+import json
+
 class Graphique:
     def __init__(self):
         self.nom = ""
@@ -15,15 +17,19 @@ class Graphique:
     def modifier_typer_score(self, type:str):
         self.type_score = type
 
-    def modifier_donnees(fichier):
-        pass
+    def modifier_donnees(self, fichier):
+        self.donnees = Donnees(fichier)
     
     def generer():
         pass
     
 class Donnees:
-    def __init__(self, fichier):
-        pass
+    def __init__(self, fichier:str):
+        if (fichier != ""):
+            # TODO Faire la vérification du contenu du fichier
+            with open(fichier, 'r') as file:
+                data = json.load(file)
+            self.donnees = data
     
 class ModeleIA:
     def __init__(self, type_score:str):
