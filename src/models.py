@@ -1,5 +1,8 @@
 import json
+import base64
 from transformers import pipeline
+from matplotlib.figure import Figure
+from io import BytesIO
 
 class Graphique:
     def __init__(self):
@@ -21,8 +24,17 @@ class Graphique:
     def modifier_donnees(self, fichier):
         self.donnees = Donnees(fichier)
     
-    def generer():
-        pass
+    def generer(self):
+        fig = Figure()
+        ax = fig.subplots()
+        ax.plot([1, 2])
+        # Save it to a temporary buffer.
+        buf = BytesIO()
+        fig.savefig(buf, format="png")
+        # Embed the result in the html output.
+        data = base64.b64encode(buf.getbuffer()).decode("ascii")
+        return data
+        
     
 class Donnees:
     def __init__(self, fichier:str):
