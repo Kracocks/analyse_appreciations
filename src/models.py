@@ -26,6 +26,7 @@ class Graphique:
     
 class Donnees:
     def __init__(self, fichier:str):
+        self.fichier = fichier
         if (fichier != ""):
             # TODO Faire la vérification du contenu du fichier
             with open(fichier, 'r') as file:

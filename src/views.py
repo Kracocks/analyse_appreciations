@@ -11,26 +11,29 @@ modeles_disponibles = ["Peed911/french_sentiment_analysis", "ac0hik/Sentiment_An
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    filename = ""
+    filename = graphique.donnees.fichier
     modele = modeles_disponibles[0]
     if request.method == 'POST':
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            return redirect(request.url)
-        file = request.files['file']
+        
+        if "charger" in request.form:
+            # check if the post request has the file part
+            if 'file' not in request.files:
+                return redirect(request.url)
+            file = request.files['file']
 
-        # If the user does not select a file, the browser submits an
-        # empty file without a filename.
-        if file.filename == '':
-            return redirect(request.url)
+            # If the user does not select a file, the browser submits an
+            # empty file without a filename.
+            if file.filename == '':
+                return redirect(request.url)
 
-        if file:
-            filename = secure_filename(file.filename)
-            graphique.modifier_donnees(os.path.join("./uploaded_files/", filename))
-            file.save(os.path.join("./uploaded_files/", filename))
+            if file:
+                filename = secure_filename(file.filename)
+                file.save(os.path.join("./uploaded_files/", filename))
+                graphique.modifier_donnees(os.path.join("./uploaded_files/", filename))
 
-        if request.form["modeles"]:
-            modele = request.form["modeles"]
+        if "analyser" in request.form:
+            if request.form["modeles"]:
+                modele = request.form["modeles"]
 
     return render_template("index.html",
                            fichier_charge=filename,
