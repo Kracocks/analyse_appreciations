@@ -11,7 +11,20 @@
     <div>
         <form method="post" enctype="multipart/form-data">
             <input type="file" name="file">
-            <input type="submit" value="Envoyer">
+
+            <label for="variables">Choisir des variables</label>
+            <select name="variables" id="variables">
+            
+            </select>
+
+            <label for="modeles">Choisir un modele</label>
+            <select name="modeles" id="modeles">
+                {% for modele in modeles %}
+                <option value="{{ modele }}" {% if modele==modele_selectionne %}selected{% endif %}>{{ modele }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="submit" value="Analyser">
         </form>
     </div>
 </body>
