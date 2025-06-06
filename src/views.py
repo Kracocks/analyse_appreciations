@@ -1,8 +1,11 @@
 from .app import app
+from .models import Graphique
 from flask import render_template
 import os
 from flask import request, redirect
 from werkzeug.utils import secure_filename
+
+graphique = Graphique()
 
 modeles_disponibles = ["Peed911/french_sentiment_analysis", "ac0hik/Sentiment_Analysis_French"]
 
@@ -23,6 +26,7 @@ def index():
 
         if file:
             filename = secure_filename(file.filename)
+            graphique.modifier_donnees(os.path.join("./uploaded_files/", filename))
             file.save(os.path.join("./uploaded_files/", filename))
 
         if request.form["modeles"]:
