@@ -14,7 +14,7 @@ modeles_disponibles = ["Peed911/french_sentiment_analysis", "ac0hik/Sentiment_An
 @app.route("/", methods=["GET", "POST"])
 def index():
     filename = graphique.donnees.fichier
-    modele = modeles_disponibles[0]
+    modele = graphique.modele_ia.nom_modele if graphique.modele_ia.nom_modele != "" else modeles_disponibles[0]
     img = ""
     if request.method == 'POST':
         
@@ -37,7 +37,8 @@ def index():
         if "analyser" in request.form:
             if request.form["modeles"]:
                 modele = request.form["modeles"]
-                
+                graphique.modifier_modele(request.form["modeles"])
+
             img = graphique.generer()
 
     return render_template("index.html",

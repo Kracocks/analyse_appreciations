@@ -23,6 +23,9 @@ class Graphique:
 
     def modifier_donnees(self, fichier):
         self.donnees = Donnees(fichier)
+        
+    def modifier_modele(self, modele):
+        self.modele_ia = ModeleIA(modele)
     
     def generer(self):
         fig = Figure()
