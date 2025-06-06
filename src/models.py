@@ -1,4 +1,5 @@
 import json
+from transformers import pipeline
 
 class Graphique:
     def __init__(self):
@@ -33,7 +34,9 @@ class Donnees:
     
 class ModeleIA:
     def __init__(self, type_score:str):
-        pass
+        self.nom_modele = type_score
     
-    def analyser(texte:str):
-        pass
+    def analyser(self, texte:str):
+        pipe = pipeline("text-classification", model=self.nom_modele)
+        res = pipe(texte)
+        return res[0]["score"]
