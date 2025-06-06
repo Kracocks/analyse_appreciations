@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analyse textes</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
 </head>
 
 <body>
@@ -31,8 +33,15 @@
 
             <input type="submit" name="analyser" value="Analyser">
         </form>
-        <img src='data:image/png;base64,{{ data }}' />
     </div>
+    {% if data != "" %}
+    <div class="chart" id="bargraph">
+        <script>
+            var graphs = {{ data | safe}};
+            Plotly.plot('bargraph', graphs, {});
+        </script>
+    </div>
+    {% endif %}
 </body>
 
 </html>

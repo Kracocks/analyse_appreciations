@@ -2,10 +2,8 @@ from .app import app
 from .models import Graphique
 from flask import render_template
 import os
-import io
 from flask import request, redirect
 from werkzeug.utils import secure_filename
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 graphique = Graphique()
 
@@ -15,7 +13,7 @@ modeles_disponibles = ["Peed911/french_sentiment_analysis", "ac0hik/Sentiment_An
 def index():
     filename = graphique.donnees.fichier
     modele = graphique.modele_ia.nom_modele if graphique.modele_ia.nom_modele != "" else modeles_disponibles[0]
-    img = ""
+    graph = ""
     if request.method == 'POST':
         
         if "charger" in request.form:
@@ -39,11 +37,11 @@ def index():
                 modele = request.form["modeles"]
                 graphique.modifier_modele(request.form["modeles"])
 
-            img = graphique.generer()
+            graph = graphique.generer()
 
     return render_template("index.html",
                            fichier_charge=filename,
                            modeles=modeles_disponibles,
                            modele_selectionne=modele,
-                           data=img)
+                           data=graph)
 

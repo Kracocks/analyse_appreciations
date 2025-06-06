@@ -1,8 +1,9 @@
 import json
-import base64
+import plotly
+import plotly.graph_objs as go
+import numpy as np
+import pandas as pd
 from transformers import pipeline
-from matplotlib.figure import Figure
-from io import BytesIO
 
 class Graphique:
     def __init__(self):
@@ -28,15 +29,22 @@ class Graphique:
         self.modele_ia = ModeleIA(modele)
     
     def generer(self):
-        fig = Figure()
-        ax = fig.subplots()
-        ax.plot([1, 2])
-        # Save it to a temporary buffer.
-        buf = BytesIO()
-        fig.savefig(buf, format="png")
-        # Embed the result in the html output.
-        data = base64.b64encode(buf.getbuffer()).decode("ascii")
-        return data
+        N = 40
+        x = np.linspace(0, 1, N)
+        y = np.random.randn(N)
+        df = pd.DataFrame({'x': x, 'y': y}) # creating a sample dataframe
+
+
+        data = [
+            go.Bar(
+                x=df['x'], # assign x as the dataframe column 'x'
+                y=df['y']
+            )
+        ]
+
+        graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+
+        return graphJSON
         
     
 class Donnees:
