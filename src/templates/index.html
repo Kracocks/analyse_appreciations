@@ -11,6 +11,7 @@
     <div>
         <form method="post" enctype="multipart/form-data">
             <input type="file" name="file">
+            <p>{% if fichier_charge == "" %} Aucun fichier chargé {% else %} Fichier chargé : {{ fichier_charge }} {% endif %}</p>
 
             <label for="variables">Choisir des variables</label>
             <select name="variables" id="variables">
