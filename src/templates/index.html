@@ -13,12 +13,15 @@
 
 <body>
     <div>
+        <p>{% if fichier_charge == "" %} Aucun fichier chargé {% else %} Fichier chargé : {{ fichier_charge }} {% endif %}</p>
         <!-- Selection de fichier -->
         {% if fichier_charge == "" %}
 
         {{ dropzone.create(action='index') }}
         {{ dropzone.load_js() }}
         {{ dropzone.config(default_message='>>> Cliquer pour sélectionner un fichier ou le glisser-déposer ici <<<') }}
+        <p>Note : Si plusieurs fichiers sont sélectionnés, seul le dernier sera utilisé. Les autres seront parmi les fichiers récemment utilisés</p>
+
         <form method="post" enctype="multipart/form-data">
             <label for="recent_files_choice">Choisir un fichier récemment utilisé</label>
             <select name="recent_files_choice" id="recent_files_choice">
@@ -38,9 +41,6 @@
         </form>
 
         {% endif %}
-
-        <p>{% if fichier_charge == "" %} Aucun fichier chargé {% else %} Fichier chargé : {{ fichier_charge }} {% endif %}</p>
-
 
         <!-- Selection de paramètres pour le graphique -->
         <form method="post">
