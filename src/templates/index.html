@@ -8,21 +8,41 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
     {{ dropzone.load_css() }}
-    {{ dropzone.style('border: 2px dashed #0087F7; margin: 10%; min-height: 400px;') }}
+    {{ dropzone.style('border: 2px dashed #0087F7; margin: 10%; min-height: 300px;') }}
 </head>
 
 <body>
     <div>
+        <!-- Selection de fichier -->
+        {% if fichier_charge == "" %}
+
         {{ dropzone.create(action='index') }}
         {{ dropzone.load_js() }}
-        {{ dropzone.config(default_message='>>> Drop here! <<<') }}
+        {{ dropzone.config(default_message='>>> Cliquer pour sélectionner un fichier ou le glisser-déposer ici <<<') }}
         <form method="post" enctype="multipart/form-data">
-            <input type="file" name="file">
-            <p>{% if fichier_charge == "" %} Aucun fichier chargé {% else %} Fichier chargé : {{ fichier_charge }} {% endif %}</p>
+            <label for="recent_files_choice">Choisir un fichier récemment utilisé</label>
+            <select name="recent_files_choice" id="recent_files_choice">
+                <option value="">Aucun fichier choisi</option>
+                {% for recent_file in recent_files %}
+                <option value="{{ recent_file }}">{{ recent_file }}</option>
+                {% endfor %}
+            </select>
 
             <input type="submit" name="charger" value="Charger">
         </form>
 
+        {% else %}
+
+        <form method="post" enctype="multipart/form">
+            <input type="submit" name="choisir_autre_fichier" value=" Choisir un autre fichier">
+        </form>
+
+        {% endif %}
+
+        <p>{% if fichier_charge == "" %} Aucun fichier chargé {% else %} Fichier chargé : {{ fichier_charge }} {% endif %}</p>
+
+
+        <!-- Selection de paramètres pour le graphique -->
         <form method="post">
             <label for="variables">Choisir des variables</label>
             <select name="variables" id="variables">

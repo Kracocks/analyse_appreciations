@@ -11,7 +11,7 @@ app.config['DROPZONE_ALLOWED_FILE_TYPE'] = '.json'
 app.config['DROPZONE_INVALID_FILE_TYPE'] = 'Seuls les fichiers .json sont acceptés'
 app.config['DROPZONE_FILE_TOO_BIG'] = 'Le fichier est trop lourd {{filesize}}. Le poids maximum est de {{maxFilesize}} MiB'
 app.config["DROPZONE_SERVER_ERROR"] = 'Problème serveur : code d\'erreur {{statusCode}}'
-app.config["DROPZONE_BROWSER_UNSUPPORTED"] = 'Votre navigateur ne supporte pas le drag \'n\' drop'
+app.config["DROPZONE_BROWSER_UNSUPPORTED"] = 'Votre navigateur ne supporte pas le glisser-déposer'
 app.config["DROPZONE_MAX_FILE_EXCEED"] = "Vous ne pouvez pas importer plus de fichier"
 
 def mkpath(p):
