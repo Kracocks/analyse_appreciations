@@ -16,32 +16,24 @@ def index():
     graph = ""
     if request.method == 'POST':
         
-        if "charger" in request.form:
-            # check if the post request has the file part
-            if 'file' not in request.files:
-                return redirect(request.url)
-            file = request.files['file']
+        # Importation des fichiers
+        file = request.files.get('file')
 
-            # If the user does not select a file, the browser submits an
-            # empty file without a filename.
-            if file.filename == '':
-                return redirect(request.url)
+        if file:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join("./uploaded_files/", filename))
+            graphique.modifier_donnees(os.path.join("./uploaded_files/", filename))
 
-            if file:
-                filename = secure_filename(file.filename)
-                file.save(os.path.join("./uploaded_files/", filename))
-                graphique.modifier_donnees(os.path.join("./uploaded_files/", filename))
-
+        # Réafficher le tableau
         if "analyser" in request.form:
             if request.form["modeles"]:
                 modele = request.form["modeles"]
                 graphique.modifier_modele(request.form["modeles"])
 
-            graph = graphique.generer()
+        graph = graphique.generer()
 
     return render_template("index.html",
                            fichier_charge=filename,
                            modeles=modeles_disponibles,
                            modele_selectionne=modele,
                            data=graph)
-
