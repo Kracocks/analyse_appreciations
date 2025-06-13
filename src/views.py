@@ -31,10 +31,9 @@ def index():
             graphique.modifier_donnees(os.path.join("./uploaded_files/", filename))
                             
         # Réafficher le tableau
-        if "analyser" in request.form:
-            if request.form["modeles"]:
-                modele_selectionne = request.form["modeles"]
-                graphique.modifier_modele(modele_selectionne)
+        if request.form["modeles_choice"]:
+            modele_selectionne = request.form["modeles_choice"]
+            graphique.modifier_modele(modele_selectionne)
 
     if (graphique.donnees.fichier != ""):
         graph = graphique.generer()

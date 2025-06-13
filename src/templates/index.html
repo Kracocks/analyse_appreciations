@@ -33,23 +33,23 @@
         <script src="{{url_for('static', filename='on_file_selected.js')}}"></script>
 
         <!-- Selection de paramètres pour le graphique -->
-        <form method="post">
-            <label for="variables">Choisir des variables</label>
-            <select name="variables" id="variables">
+        <form method="post" id="parametre_form">
+            <label for="variables_choice">Choisir des variables</label>
+            <select name="variables_choice" id="variables_choice">
             
             </select>
             
-            <label for="modeles">Choisir un modele</label>
-            <select name="modeles" id="modeles">
+            <label for="modeles_choice">Choisir un modele</label>
+            <select name="modeles_choice" id="modeles_choice">
                 {% for modele in modeles_disponibles %}
                 <option value="{{ modele }}" {% if modele==modele_selectionne %}selected{% endif %}>{{ modele }}</option>
                 {% endfor %}
             </select>
-
-            <input type="submit" name="analyser" value="Analyser">
         </form>
+        <script src="{{url_for('static', filename='on_parametre_change.js')}}"></script>
+
     </div>
-    {% if data != "" %}
+    {% if graph != "" %}
     <div class="chart" id="bargraph">
         <script>
             var graphs = {{ graph | safe}};
