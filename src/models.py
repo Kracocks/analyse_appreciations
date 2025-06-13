@@ -23,17 +23,16 @@ class Graphique:
         self.type_score = type
 
     def modifier_donnees(self, fichier):
-        self.donnees = Donnees(fichier)
+        self.donnees.modfier_fichier(fichier)
         
     def modifier_modele(self, modele):
-        self.modele_ia = ModeleIA(modele)
+        self.modele_ia.modifier_modele(modele)
     
     def generer(self):
         N = 40
         x = np.linspace(0, 1, N)
         y = np.random.randn(N)
         df = pd.DataFrame({'x': x, 'y': y}) # creating a sample dataframe
-
 
         data = [
             go.Bar(
@@ -49,16 +48,26 @@ class Graphique:
     
 class Donnees:
     def __init__(self, fichier:str):
-        self.fichier = fichier
-        if (fichier != ""):
-            # TODO Faire la vérification du contenu du fichier
-            with open(fichier, 'r') as file:
+        self.modfier_fichier(fichier)
+
+    def modfier_fichier(self, new_fichier:str):
+        self.fichier = new_fichier
+        if (self.fichier != ""):
+            with open(self.fichier, 'r') as file:
                 data = json.load(file)
-            self.donnees = data
+                if self.verifier_contenu(data):
+                    self.donnees = data
+            
+    def verifier_contenu(self, donnee) -> bool:
+        # TODO Faire la vérification du contenu du fichier
+        return True
     
 class ModeleIA:
     def __init__(self, type_score:str):
         self.nom_modele = type_score
+        
+    def modifier_modele(self, new_nom_modele:str):
+        self.nom_modele = new_nom_modele
     
     def analyser(self, texte:str):
         pipe = pipeline("text-classification", model=self.nom_modele)
