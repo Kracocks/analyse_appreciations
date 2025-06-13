@@ -21,7 +21,7 @@
         {{ dropzone.config(
             custom_options='addRemoveLinks: true') }}
 
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" id="recent_file_form">
             <label for="recent_files_choice">Choisir un fichier récemment utilisé</label>
             <select name="recent_files_choice" id="recent_files_choice">
                 <option value="">Aucun fichier choisi</option>
@@ -30,6 +30,7 @@
                 {% endfor %}
             </select>
         </form>
+        <script src="{{url_for('static', filename='on_file_selected.js')}}"></script>
 
         <!-- Selection de paramètres pour le graphique -->
         <form method="post">
