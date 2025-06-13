@@ -25,8 +25,8 @@
             <label for="recent_files_choice">Choisir un fichier récemment utilisé</label>
             <select name="recent_files_choice" id="recent_files_choice">
                 <option value="">Aucun fichier choisi</option>
-                {% for recent_file in recent_files %}
-                <option value="{{ recent_file }}">{{ recent_file }}</option>
+                {% for fichier_recent in fichiers_recents %}
+                <option value="{{ fichier_recent }}">{{ fichier_recent }}</option>
                 {% endfor %}
             </select>
         </form>
@@ -40,7 +40,7 @@
             
             <label for="modeles">Choisir un modele</label>
             <select name="modeles" id="modeles">
-                {% for modele in modeles %}
+                {% for modele in modeles_disponibles %}
                 <option value="{{ modele }}" {% if modele==modele_selectionne %}selected{% endif %}>{{ modele }}</option>
                 {% endfor %}
             </select>
@@ -51,7 +51,7 @@
     {% if data != "" %}
     <div class="chart" id="bargraph">
         <script>
-            var graphs = {{ data | safe}};
+            var graphs = {{ graph | safe}};
             Plotly.plot('bargraph', graphs, {});
         </script>
     </div>
