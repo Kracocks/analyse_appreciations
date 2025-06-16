@@ -31,8 +31,8 @@ def index():
             graphique.modifier_donnees(os.path.join("./uploaded_files/", filename))
                             
         # Réafficher le tableau
-        if request.form["modeles_choice"]:
-            modele_selectionne = request.form["modeles_choice"]
+        if request.form.get("modeles_choice"):
+            modele_selectionne = request.form.get("modeles_choice")
             graphique.modifier_modele(modele_selectionne)
 
     if (graphique.donnees.fichier != ""):
