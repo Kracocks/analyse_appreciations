@@ -52,9 +52,9 @@ class Graphique:
         Returns:
             str: Le graphique généré
         """
-        N = 40
-        x = np.linspace(0, 1, N) # 
-        y = np.random.randn(N)
+        N = len(self.donnees.get_trimestres())
+        x = [t for t in self.donnees.get_trimestres()]
+        y = self.donnees.get_moyennes_generales()
         df = pd.DataFrame({'x': x, 'y': y}) # creating a sample dataframe
 
         data = [
@@ -105,6 +105,34 @@ class Donnees:
         """
         # TODO Faire la vérification du contenu du fichier
         return True
+    
+    def get_annees_scolaire(self) -> list[str]:
+        annees = []
+        for annee in self.donnees.get("annees_scolaire"):
+            annees.append(annees)
+        return annees
+    
+    def get_trimestres(self) -> list[str]:
+        trimestres = []
+        for annee in self.donnees.get("annees_scolaire"):
+            for trimestre in self.donnees["annees_scolaire"][annee]["trimestres"]:
+                trimestres.append(trimestre)
+        return trimestres
+    
+    def get_moyennes_generales(self) -> list[float]:
+        """Permet d'obtenir toute les moyennes générales à partir du fichier séléctionné 
+
+        Returns:
+            list[float]: Les moyennes générales
+        """
+        moyennes = []
+        for annee in self.donnees.get("annees_scolaire"):
+            if (annee != "No data"):        
+                for trimestre in self.donnees["annees_scolaire"][annee]["trimestres"]:
+                    moyenne = self.donnees["annees_scolaire"][annee]["trimestres"][trimestre]["moyenne_generale"]
+                    moyennes.append(moyenne)
+        return moyennes
+    
     
 class ModeleIA:
     def __init__(self, type_score:str):
