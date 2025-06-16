@@ -8,14 +8,14 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
     {{ dropzone.load_css() }}
-    {{ dropzone.style('border: 2px dashed #0087F7; border-radius : 20px; min-height: 215px;') }}
+    {{ dropzone.style('border: 2px dashed #0087F7; border-radius : 20px; min-height: 15%; max-width: 25%') }}
 </head>
 
 <body>
     <div>
         <!-- Selection de fichier -->
         <script>
-            dropzone_message = ">>> Glissez-déposez ou cliquez pour sélectionner <<< <br>"
+            dropzone_message = ">>> Glissez-déposez ou cliquez pour sélectionner <<< <br><br>"
             temp = "{{ fichier_charge | safe }}" != "" ? "Fichier chargé : {{ fichier_charge | safe }}" : ""
             dropzone_message = dropzone_message + temp
             console.log(dropzone_message)
