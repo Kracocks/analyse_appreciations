@@ -13,13 +13,19 @@
 
 <body>
     <div>
-        <p>{% if fichier_charge == "" %} Aucun fichier chargé {% else %} Fichier chargé : {{ fichier_charge }} {% endif %}</p>
         <!-- Selection de fichier -->
+        <script>
+            dropzone_message = ">>> Glissez-déposez ou cliquez pour sélectionner <<< <br>"
+            temp = "{{ fichier_charge | safe }}" != "" ? "Fichier chargé : {{ fichier_charge | safe }}" : ""
+            dropzone_message = dropzone_message + temp
+            console.log(dropzone_message)
+        </script>
 
         {{ dropzone.create(action='index') }}
         {{ dropzone.load_js() }}
         {{ dropzone.config(
-            custom_options='addRemoveLinks: true') }}
+            custom_options='addRemoveLinks: true, 
+                            dictDefaultMessage: dropzone_message') }}
 
         <form method="post" enctype="multipart/form-data" id="recent_file_form">
             <label for="recent_files_choice">Choisir un fichier récemment utilisé</label>
