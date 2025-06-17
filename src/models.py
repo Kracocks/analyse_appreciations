@@ -52,6 +52,7 @@ class Graphique:
         Returns:
             str: Le graphique généré
         """
+        # Récupération des données
         annees_scolaire = self.donnees.get_annees_scolaire()
         trimestres = []
         resultats = dict()
@@ -67,7 +68,8 @@ class Graphique:
 
                 if "appréciations générales" in self.variables: # Obtenir les appréciations générales
                     if not resultats.get("appréciations générales"):
-                        resultats["appréciations générales"] = []
+                        resultats["appréciations générales"] = [] # Les scores des l'appréciations
+                        resultats["appreciations_generales_text"] = [] # Les textes des l'appréciations
                     if self.donnees.score_existe(annee_scolaire, trimestre, self.modele_ia.nom_modele): # Si le score avec le modele choisi existe alors on prend le score
                         score = self.donnees.get_score_appreciation(annee_scolaire, trimestre, self.modele_ia.nom_modele)
                     else: # Sinon on fait le score et on le stocke dans le JSON
@@ -75,12 +77,31 @@ class Graphique:
                         score = self.modele_ia.analyser(ag)
                         self.donnees.set_score_appreciation(annee_scolaire, trimestre, self.modele_ia.nom_modele, score)
                     resultats["appréciations générales"].append(score)
+                    
+                    resultats["appreciations_generales_text"].append(self.donnees.get_appreciation(annee_scolaire, trimestre))
+                    
 
+        # Création du graphique
         data = go.Figure(layout_yaxis_range=[0,20])
         for nom, valeurs in resultats.items():
-            data.add_trace(go.Scatter(x=trimestres, y=valeurs,
-                                      mode='lines',
-                                      name=nom))
+            match nom:
+                case "moyennes générales":
+                    data.add_trace(go.Scatter(x=trimestres, y=valeurs,
+                                            mode='lines',
+                                            name=nom,
+                                            hovertemplate="note : %{y}"
+                                            ))
+
+                case "appréciations générales":
+                    data.add_trace(go.Scatter(x=trimestres, y=valeurs,
+                                            mode='lines',
+                                            name=nom,
+                                            hovertemplate="appreciation : %{text}<br>score : %{y}",
+                                            text=[resultats["appreciations_generales_text"][i].format(i + 1) for i in range(len(resultats["appreciations_generales_text"]))]
+                                            ))
+
+                case "appreciations_generales_text":
+                    pass
 
         graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
@@ -207,7 +228,6 @@ class Donnees:
         Returns:
             bool: Retourne True si le score calculé par l'ia choisi existe, Sinon False
         """
-        print(self.donnees)
         if matiere:
             return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere].get("appreciation_score_" + modele_ia) != None
         else:
