@@ -10,7 +10,7 @@ class Graphique:
         """Le contructeur de la classe Graphique
         """
         self.nom = ""
-        self.variables = []
+        self.variables = ["moyennes générales", "appréciations générales"]
         self.donnees = Donnees("")
         self.modele_ia = ModeleIA("")
         
@@ -52,17 +52,51 @@ class Graphique:
         Returns:
             str: Le graphique généré
         """
-        N = len(self.donnees.get_trimestres())
-        x = [t for t in self.donnees.get_trimestres()]
-        y = self.donnees.get_moyennes_generales()
-        df = pd.DataFrame({'x': x, 'y': y}) # creating a sample dataframe
+        annees_scolaire = self.donnees.get_annees_scolaire()
+        trimestres = []
+        resultats = dict()
+        for annee_scolaire in annees_scolaire:
+            for trimestre in self.donnees.get_trimestres(annee_scolaire):
+                trimestres.append(trimestre)
 
-        data = [
-            go.Line(
-                x=df['x'], # assign x as the dataframe column 'x'
-                y=df['y']
-            )
-        ]
+                if "moyennes générales" in self.variables: # Obtenir les moyennes générales
+                    if not resultats.get("moyennes générales"):
+                        resultats["moyennes générales"] = []
+                    mg = self.donnees.get_moyenne(annee_scolaire, trimestre)
+                    resultats["moyennes générales"].append(mg)
+
+                if "appréciations générales" in self.variables: # Obtenir les appréciations générales
+                    if not resultats.get("appréciations générales"):
+                        resultats["appréciations générales"] = []
+                    if self.donnees.score_existe(annee_scolaire, trimestre, self.modele_ia.nom_modele): # Si le score avec le modele choisi existe alors on prend le score
+                        score = self.donnees.get_score_appreciation(annee_scolaire, trimestre, self.modele_ia.nom_modele)
+                    else: # Sinon on fait le score et on le stocke dans le JSON
+                        ag = self.donnees.get_appreciation(annee_scolaire, trimestre)
+                        score = self.modele_ia.analyser(ag)
+                        self.donnees.set_score_appreciation(annee_scolaire, trimestre, self.modele_ia.nom_modele, score)
+                    resultats["appréciations générales"].append(score)
+        
+        print(resultats)
+            
+            
+        data = go.Figure()
+        for nom, valeurs in resultats.items():
+            data.add_trace(go.Scatter(x=trimestres, y=valeurs,
+                                      mode='lines',
+                                      name=nom))
+            
+            
+        # N = len(trimestres)
+        # x = trimestres
+        # y = resultats["appreciations_générales"]
+        # df = pd.DataFrame({'x': x, 'y': y}) # creating a sample dataframe
+
+        # data = [
+        #     go.Line(
+        #         x=df['x'], # assign x as the dataframe column 'x'
+        #         y=df['y']
+        #     )
+        # ]
 
         graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
@@ -107,32 +141,88 @@ class Donnees:
         return True
     
     def get_annees_scolaire(self) -> list[str]:
-        annees = []
-        for annee in self.donnees.get("annees_scolaire"):
-            annees.append(annees)
-        return annees
-    
-    def get_trimestres(self) -> list[str]:
-        trimestres = []
-        for annee in self.donnees.get("annees_scolaire"):
-            for trimestre in self.donnees["annees_scolaire"][annee]["trimestres"]:
-                trimestres.append(trimestre)
-        return trimestres
-    
-    def get_moyennes_generales(self) -> list[float]:
-        """Permet d'obtenir toute les moyennes générales à partir du fichier séléctionné 
+        """Permet d'avoir toute les années scolaire enregistré dans le fichier
 
         Returns:
-            list[float]: Les moyennes générales
+            list[str]: Les années scolaire dans le fichier
         """
-        moyennes = []
+        annees = []
         for annee in self.donnees.get("annees_scolaire"):
-            if (annee != "No data"):        
-                for trimestre in self.donnees["annees_scolaire"][annee]["trimestres"]:
-                    moyenne = self.donnees["annees_scolaire"][annee]["trimestres"][trimestre]["moyenne_generale"]
-                    moyennes.append(moyenne)
-        return moyennes
+            annees.append(annee)
+        return annees
     
+    def get_trimestres(self, annee_scolaire:str) -> list[str]:
+        """Permet d'avoir tout les trimestre enregistré d'une année scolaire
+
+        Args:
+            annee_scolaire (str): l'année scolaire ou prendre les trimestres
+
+        Returns:
+            list[str]: Tout les trimestres enregistré d'une année scolaire
+        """
+        trimestres = []
+        for trimestre in self.donnees["annees_scolaire"][annee_scolaire]["trimestres"]:
+            trimestres.append(trimestre)
+        return trimestres
+    
+    def get_moyenne(self, annee_scolaire:str, trimestre:str, matiere:str=None) -> float:
+        """Permet d'obtenir la moyenne à partir de l'année scolaire et du trimestre sélectionné. Si aucune matière n'est sélectionné, on choisi la moyenne générale sinon on choisi la moyenne de la matière
+
+        Args:
+            annee_scolaire (str): L'année scolaire choisi
+            trimestre (str): Le trimestre de l'année scolaire choisi
+            matiere (str, optional): La matière sélectionné. Si aucune, prendre la moyenne générale. none par défault.
+
+        Returns:
+            float: La moyenne
+        """
+        if matiere:
+            return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["moyenne"]
+        return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["moyenne_generale"]
+    
+    def get_appreciation(self, annee_scolaire:str, trimestre:str, matiere:str = None) -> str:
+        """Permet d'obtenir l'appréciation à partir de l'année scolaire et du trimestre sélectionné. Si aucune matière n'est sélectionné, on choisi l'appréciation générale sinon on choisi la moyenne de l'appréciation
+
+        Args:
+            annee_scolaire (str): L'année scolaire choisi
+            trimestre (str): le trimestre de l'année scolaire choisi
+            matiere (str, optional): La matière sélectionné. Si aucune, prendre la moyenne générale. none par défault.
+
+        Returns:
+            str: L'appréciation
+        """
+        if matiere:
+            return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["appreciation"]
+        return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["appreciation_generale"]
+    
+    def get_score_appreciation(self, annee_scolaire:str, trimestre:str, modele_ia:str, matiere:str = None) -> float:
+        """Permet d'obtenir le score d'une appreciation à partir de l'année scolaire et du trimestre sélectionné. Si aucune matière n'est sélectionné, on choisi le score de l'appréciation générale sinon on choisi le score de l'appréciation de la matière choisi
+
+        Args:
+            annee_scolaire (str): _description_
+            trimestre (str): _description_
+            modele_ia (str): _description_
+            matiere (str, optional): _description_. Defaults to None.
+
+        Returns:
+            float: _description_
+        """
+        if matiere:
+            return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["appreciation_score_" + modele_ia]
+        return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["appreciation_generale_score_" + modele_ia]
+    
+    def score_existe(self, annee_scolaire:str, trimestre:str, modele_ia:str, matiere:str = None) -> bool:
+        if matiere:
+            return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere].get("appreciation_score_" + modele_ia) != None
+        else:
+            return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre].get("appreciation_generale_score_" + modele_ia) != None
+            
+    
+    def set_score_appreciation(self, annee_scolaire:str, trimestre:str, modele_ia:str, score:float, matiere:str = None):
+        if matiere:
+            self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["appreciation_score_" + modele_ia] = score
+        else:
+            self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["appreciation_generale_score_" + modele_ia] = score
     
 class ModeleIA:
     def __init__(self, type_score:str):

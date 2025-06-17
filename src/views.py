@@ -9,6 +9,8 @@ graphique = Graphique()
 
 modeles_disponibles = ["Peed911/french_sentiment_analysis", "ac0hik/Sentiment_Analysis_French"]
 
+graphique.modifier_modele(modeles_disponibles[0])
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     fichiers_recents = [f for f in os.listdir("./uploaded_files/") if os.path.isfile(os.path.join("./uploaded_files/", f))]
