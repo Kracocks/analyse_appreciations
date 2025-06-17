@@ -77,26 +77,12 @@ class Graphique:
                     resultats["appréciations générales"].append(score)
         
         print(resultats)
-            
-            
-        data = go.Figure()
+
+        data = go.Figure(layout_yaxis_range=[0,20])
         for nom, valeurs in resultats.items():
             data.add_trace(go.Scatter(x=trimestres, y=valeurs,
                                       mode='lines',
                                       name=nom))
-            
-            
-        # N = len(trimestres)
-        # x = trimestres
-        # y = resultats["appreciations_générales"]
-        # df = pd.DataFrame({'x': x, 'y': y}) # creating a sample dataframe
-
-        # data = [
-        #     go.Line(
-        #         x=df['x'], # assign x as the dataframe column 'x'
-        #         y=df['y']
-        #     )
-        # ]
 
         graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
