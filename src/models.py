@@ -89,14 +89,14 @@ class Graphique:
                     data.add_trace(go.Scatter(x=trimestres, y=valeurs,
                                             mode='lines',
                                             name=nom,
-                                            hovertemplate="note : %{y}"
+                                            hovertemplate="%{y}"
                                             ))
 
                 case "appréciations générales":
                     data.add_trace(go.Scatter(x=trimestres, y=valeurs,
                                             mode='lines',
                                             name=nom,
-                                            hovertemplate="appreciation : %{text}<br>score : %{y}",
+                                            hovertemplate="%{text}<br>score : %{y}",
                                             text=[resultats["appreciations_generales_text"][i].format(i + 1) for i in range(len(resultats["appreciations_generales_text"]))]
                                             ))
 
