@@ -242,14 +242,17 @@ class ModeleIA:
         self.nom_modele = new_nom_modele
     
     def analyser(self, texte:str) -> float:
-        """Analyse et donne un score à un texte à partir du modele d'IA sélectionné
+        """Analyse et donne un score /20 à un texte à partir du modele d'IA sélectionné
 
         Args:
             texte (str): Le texte à analyser
 
         Returns:
-            float: Le score attribué au texte
+            float: Le score /20 attribué au texte
         """
-        pipe = pipeline("text-classification", model=self.nom_modele)
+        pipe = pipeline("text-classification", model=self.nom_modele, top_k=None)
         res = pipe(texte)
-        return res[0]["score"]
+        print(texte, " ", res)
+        for scores in res[0]:
+            if scores["label"].upper() == "POSITIVE":
+                return scores["score"] *20
