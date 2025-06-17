@@ -75,8 +75,6 @@ class Graphique:
                         score = self.modele_ia.analyser(ag)
                         self.donnees.set_score_appreciation(annee_scolaire, trimestre, self.modele_ia.nom_modele, score)
                     resultats["appréciations générales"].append(score)
-        
-        print(resultats)
 
         data = go.Figure(layout_yaxis_range=[0,20])
         for nom, valeurs in resultats.items():
@@ -209,6 +207,7 @@ class Donnees:
         Returns:
             bool: Retourne True si le score calculé par l'ia choisi existe, Sinon False
         """
+        print(self.donnees)
         if matiere:
             return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere].get("appreciation_score_" + modele_ia) != None
         else:
@@ -229,6 +228,10 @@ class Donnees:
             self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["appreciation_score_" + modele_ia] = score
         else:
             self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["appreciation_generale_score_" + modele_ia] = score
+        with open(self.fichier, 'r+') as f:
+            f.seek(0)
+            json.dump(self.donnees, f, indent=4)
+            f.truncate()
     
 class ModeleIA:
     def __init__(self, type_score:str):
@@ -258,7 +261,6 @@ class ModeleIA:
         """
         pipe = pipeline("text-classification", model=self.nom_modele, top_k=None)
         res = pipe(texte)
-        print(texte, " ", res)
         for scores in res[0]:
             if scores["label"].upper() == "POSITIVE":
                 return scores["score"] *20
