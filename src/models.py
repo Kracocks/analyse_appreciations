@@ -52,12 +52,14 @@ class Graphique:
 
         Returns:
             str: Le graphique généré
-        """
+        """   
+        # Récupération des données
+        self.chargement.progession = 0
         self.chargement.est_fini = False
-        self.chargement.progession = 1
         self.chargement.status = "Récupération des données"
         
-        # Récupération des données
+        nb_total_donnees = self.donnees.get_nb_total_donnees()
+        print("Nombre d'elements : ", nb_total_donnees)
         annees_scolaire = self.donnees.get_annees_scolaire()
         trimestres = []
         resultats = dict()
@@ -66,12 +68,17 @@ class Graphique:
                 trimestres.append(trimestre)
 
                 if "moyennes générales" in self.variables: # Obtenir les moyennes générales
+                    self.chargement.status = "Récupération de la moyenne générale du " + trimestre + " de l'année scolaire " + annee_scolaire
+                    
                     if not resultats.get("moyennes générales"):
                         resultats["moyennes générales"] = []
                     mg = self.donnees.get_moyenne(annee_scolaire, trimestre)
                     resultats["moyennes générales"].append(mg)
+                    
+                    self.chargement.progession += 1 * 80 / nb_total_donnees
 
                 if "appréciations générales" in self.variables: # Obtenir les appréciations générales
+                    self.chargement.status = "Récupération de l'appréciation générale du " + trimestre + " de l'année scolaire " + annee_scolaire
                     if not resultats.get("appréciations générales"):
                         resultats["appréciations générales"] = [] # Les scores des l'appréciations
                         resultats["appreciations_generales_text"] = [] # Les textes des l'appréciations
@@ -82,13 +89,15 @@ class Graphique:
                         score = self.modele_ia.analyser(ag)
                         self.donnees.set_score_appreciation(annee_scolaire, trimestre, self.modele_ia.nom_modele, score)
                     resultats["appréciations générales"].append(score)
-                    
                     resultats["appreciations_generales_text"].append(self.donnees.get_appreciation(annee_scolaire, trimestre))
 
-        self.chargement.progession = 2
-        self.chargement.status = "Création du graphique"
+                    self.chargement.progession += 1 * 80 / nb_total_donnees
+
+                print(self.chargement.progession)
         
         # Création du graphique
+        self.chargement.status = "Création du graphique"
+        
         data = go.Figure(layout_yaxis_range=[0,20])
         for nom, valeurs in resultats.items():
             match nom:
@@ -262,6 +271,18 @@ class Donnees:
             f.seek(0)
             json.dump(self.donnees, f, indent=4)
             f.truncate()
+    
+    def get_nb_total_donnees(self) -> int:
+        total = 0
+        for annee_scolaire in self.donnees["annees_scolaire"]:
+            for trimestre in self.donnees["annees_scolaire"][annee_scolaire]["trimestres"]:
+                # On va prendre toute les "feuilles" dans un trimestre on enleve juste 
+                # les feuilles "score" (car je considère que score et appréciation représente 
+                # la même données) et "matiere" puis on prend tout les matières et on les 
+                # multiplies par deux car il y a deux données par matière 
+                total += (len(self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]) - 2) + len(self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"]) * 2
+        
+        return total
     
 class ModeleIA:
     def __init__(self, type_score:str):

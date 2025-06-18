@@ -5,6 +5,7 @@ import os
 from flask import request
 from werkzeug.utils import secure_filename
 import json
+import threading
 
 graphique = Graphique()
 
@@ -38,15 +39,13 @@ def index():
             modele_selectionne = request.form.get("modeles_choice")
             graphique.modifier_modele(modele_selectionne)
 
-    if (graphique.donnees.fichier != ""):
-        graph = graphique.generer()
+
 
     return render_template("index.html",
                            fichier_charge=filename,
                            modeles_disponibles=modeles_disponibles,
                            fichiers_recents=fichiers_recents,
-                           modele_selectionne=modele_selectionne,
-                           graph=graph)
+                           modele_selectionne=modele_selectionne)
 
 @app.route('/progress')
 def progress():
@@ -57,3 +56,19 @@ def progress():
         yield "data:" + str(data) + "\n\n"
     
     return Response(generate(), mimetype='text/event-stream')
+
+@app.route("/generate")
+def start_generation():
+    def run():
+        global graph
+        if (graphique.donnees.fichier != ""):
+            graph = graphique.generer()
+    threading.Thread(target=run).start()
+    return "Started"
+
+@app.route("/get-graph")
+def get_graph():
+    graph = ""
+    if (graphique.donnees.fichier != ""):
+        graph = graphique.generer()
+    return json.dumps({"graph": graph})

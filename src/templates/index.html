@@ -68,39 +68,21 @@
 
     </div>
 
-    <!-- Affichage du graphique -->
-    {% if graph != "" %}
+    <!-- Zone du graphique -->
     <div class="chart" id="bargraph"></div>
     <p id="selected_text"></p>
-    <script>
-        var graphs = {{ graph | safe}};
-        Plotly.plot('bargraph', graphs, {});
 
-        var graphique = document.getElementById('bargraph');
-        var selected_text = '';
-
-        graphique.on('plotly_click', function(data){
-            for(var i=0; i < data.points.length; i++){
-                if (data.points[i].fullData.name == "appréciations générales") {
-                    selected_text = "Texte sélectionné : " +data.points[i].customdata
-                }
-            }
-            
-            var paragraph = document.getElementById("selected_text");
-            paragraph.textContent = selected_text
-        });
-
-    </script>
-    {% endif %}
-
-    <!-- Bar de chargement -->
+    <!-- Zone de la bar de chargement -->
     <div class="progress" id="progress" style="width: 50%; margin: 50px;">
-		<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-			<span class="progress-bar-label">0%</span>
-		</div>
-	</div>
+        <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+            <span class="progress-bar-label">0%</span>
+        </div>
+    </div>
 
+    <!-- Script de la zone de chargement-->
+    {% if fichier_charge != "" %}
     <script>
+        // Début d'un lecteur d'évenement pour mettre a jour la barre de chargement
         var source = new EventSource("/progress");
         source.onmessage = function(event) {
             var graphique = document.getElementById("bargraph");
@@ -113,7 +95,9 @@
             
             console.log(event)
             $('.progress-bar').css('width', data.progression+'%').attr('aria-valuenow', data.progression);
-		    $('.progress-bar-label').text(data.progression+'%');
+            $('.progress-bar-label').text(data.progression+'%');
+
+            console.log(data.progression)
     
             if(data.progression == 100){
                 graphique.style.display = "block";
@@ -121,8 +105,27 @@
                 source.close()
             }
         }
+        // Génération du graphqiue quand un fichier est sélectionné
+        fetch('/get-graph').then(r => r.json()).then(data => {
+            var graphs = JSON.parse(data.graph);
+            Plotly.plot('bargraph', graphs, {});
+
+            var graphique = document.getElementById('bargraph');
+            var selected_text = '';
+
+            graphique.on('plotly_click', function(data){
+                for(var i=0; i < data.points.length; i++){
+                    if (data.points[i].fullData.name == "appréciations générales") {
+                        selected_text = "Texte sélectionné : " +data.points[i].customdata
+                    }
+                }
+                
+                var paragraph = document.getElementById("selected_text");
+                paragraph.textContent = selected_text
+            });
+        });
     </script>
-    
+    {% endif %}
 </body>
 
 </html>
