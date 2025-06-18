@@ -56,12 +56,27 @@
 
     </div>
     {% if graph != "" %}
-    <div class="chart" id="bargraph">
-        <script>
-            var graphs = {{ graph | safe}};
-            Plotly.plot('bargraph', graphs, {});
-        </script>
-    </div>
+    <div class="chart" id="bargraph"></div>
+    <p id="selected_text"></p>
+    <script>
+        var graphs = {{ graph | safe}};
+        Plotly.plot('bargraph', graphs, {});
+
+        var graphique = document.getElementById('bargraph');
+        var selected_text = '';
+
+        graphique.on('plotly_click', function(data){
+            for(var i=0; i < data.points.length; i++){
+                if (data.points[i].fullData.name == "appréciations générales") {
+                    selected_text = "Texte sélectionné : " +data.points[i].customdata
+                }
+            }
+            
+            var paragraph = document.getElementById("selected_text");
+            paragraph.textContent = selected_text
+        });
+
+    </script>
     {% endif %}
 </body>
 
