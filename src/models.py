@@ -13,6 +13,7 @@ class Graphique:
         self.variables = ["moyennes générales", "appréciations générales"]
         self.donnees = Donnees("")
         self.modele_ia = ModeleIA("")
+        self.chargement = Chargement()
         
     def ajouter_variable(self, var:str):
         """Ajouter une varible parmis les variables qui seront affiché dans le graphique
@@ -52,6 +53,10 @@ class Graphique:
         Returns:
             str: Le graphique généré
         """
+        self.chargement.est_fini = False
+        self.chargement.progession = 1
+        self.chargement.status = "Récupération des données"
+        
         # Récupération des données
         annees_scolaire = self.donnees.get_annees_scolaire()
         trimestres = []
@@ -79,8 +84,10 @@ class Graphique:
                     resultats["appréciations générales"].append(score)
                     
                     resultats["appreciations_generales_text"].append(self.donnees.get_appreciation(annee_scolaire, trimestre))
-                    
 
+        self.chargement.progession = 2
+        self.chargement.status = "Création du graphique"
+        
         # Création du graphique
         data = go.Figure(layout_yaxis_range=[0,20])
         for nom, valeurs in resultats.items():
@@ -104,6 +111,9 @@ class Graphique:
                     pass
 
         graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+
+        self.chargement.progession = 100
+        self.chargement.est_fini = True
 
         return graphJSON
         
@@ -284,3 +294,9 @@ class ModeleIA:
         for scores in res[0]:
             if scores["label"].upper() == "POSITIVE":
                 return scores["score"] *20
+            
+class Chargement:
+    def __init__(self):
+        self.progession = 0
+        self.est_fini = False
+        self.status = ""

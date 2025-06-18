@@ -4,7 +4,7 @@ from flask import render_template, Response
 import os
 from flask import request
 from werkzeug.utils import secure_filename
-import time
+import json
 
 graphique = Graphique()
 
@@ -51,11 +51,9 @@ def index():
 @app.route('/progress')
 def progress():
     def generate():
-        x = 0
-        
-        while x <= 100:
-            yield "data:" + str(x) + "\n\n"
-            x += 10
-            time.sleep(0.5)
+        progression = graphique.chargement.progession
+        status = graphique.chargement.status
+        data = json.dumps({"progression": progression, "status":status})
+        yield "data:" + str(data) + "\n\n"
     
     return Response(generate(), mimetype='text/event-stream')
