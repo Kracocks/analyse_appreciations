@@ -87,17 +87,17 @@ class Graphique:
             match nom:
                 case "moyennes générales":
                     data.add_trace(go.Scatter(x=trimestres, y=valeurs,
-                                            mode='lines',
-                                            name=nom,
-                                            hovertemplate="%{y}"
+                                              mode='lines',
+                                              name=nom,
+                                              hovertemplate="%{y}"
                                             ))
 
                 case "appréciations générales":
                     data.add_trace(go.Scatter(x=trimestres, y=valeurs,
-                                            mode='lines',
-                                            name=nom,
-                                            hovertemplate="%{text}<br>score : %{y}",
-                                            text=[resultats["appreciations_generales_text"][i].format(i + 1) for i in range(len(resultats["appreciations_generales_text"]))]
+                                              customdata=resultats["appreciations_generales_text"],
+                                              mode='lines',
+                                              name=nom,
+                                              hovertemplate="%{customdata}<br>score : %{y}"
                                             ))
 
                 case "appreciations_generales_text":
