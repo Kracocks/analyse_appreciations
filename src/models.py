@@ -65,7 +65,7 @@ class Graphique:
         resultats = dict()
         for annee_scolaire in annees_scolaire:
             for trimestre in self.donnees.get_trimestres(annee_scolaire):
-                trimestres.append(trimestre)
+                trimestres.append(trimestre + " année " + annee_scolaire)
 
                 # Obtenir les moyennes générales
                 self.chargement.status = "Récupération de la moyenne générale du " + trimestre + " de l'année scolaire " + annee_scolaire
@@ -96,6 +96,33 @@ class Graphique:
                 self.chargement.progession += 1 * 80 / nb_total_donnees
 
                 print(self.chargement.progession)
+                
+        #resultats = pd.DataFrame(resultats)
+        trimestres_manquants = []
+        donnees_manquantes = dict()
+        i = 0
+        while i < len(trimestres):
+            for nom in resultats:
+                if not "text" in nom: # On ne veux pas des textes
+                    if (resultats[nom][i] == None):
+                        j = i
+                        while j < len(trimestres):
+                            if (resultats[nom][j] != None):
+                                if (not donnees_manquantes.get(nom)):
+                                    donnees_manquantes[nom] = {"trimestres": [], "valeurs": []}
+                                # Début des données manquantes
+                                if (i > 0): # Si on est pas au début
+                                    donnees_manquantes[nom]["valeurs"].append(resultats[nom][i-1])
+                                    donnees_manquantes[nom]["trimestres"].append(trimestres[i-1])
+                                else:
+                                    donnees_manquantes[nom]["valeurs"].append(resultats[nom][i])
+                                    donnees_manquantes[nom]["trimestres"].append(trimestres[i])
+                                # Fin des données manquantes
+                                donnees_manquantes[nom]["valeurs"].append(resultats[nom][j])
+                                donnees_manquantes[nom]["trimestres"].append(trimestres[j])
+                            j += 1
+            print(donnees_manquantes)
+            i += 1
         
         # Création du graphique
         self.chargement.status = "Création du graphique"
@@ -120,6 +147,16 @@ class Graphique:
 
                 case "appreciations_generales_text":
                     pass
+        
+        #Affichage ligne pour données manquantes     
+        for nom, valeurs in donnees_manquantes.items():
+            data.add_trace(go.Scatter(
+                x=valeurs["trimestres"], y=valeurs["valeurs"],
+                mode="lines",
+                name=nom,
+                hoverinfo="skip",
+                line=dict(dash= "longdash")
+            ))
 
         graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
