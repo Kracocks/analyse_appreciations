@@ -22,7 +22,7 @@
 </head>
 
 <body>
-    <div>
+    <div id="file-input">
         <!-- Selection de fichier -->
         <script>
             dropzone_message = ">>> Glissez-déposez ou cliquez pour sélectionner <<< <br><br>"
@@ -48,7 +48,10 @@
             </select>
         </form>
         <script src="{{url_for('static', filename='on_file_selected.js')}}"></script>
+    </div>
 
+    <!-- Tout les éléments qui seront affiché lorsqu'un fichier à été sélectionné comme le choix du modèle, le graphique et la bar de chargement -->
+    <div id="graphique-zone">
         <!-- Selection de paramètres pour le graphique -->
         <form method="post" id="parametre_form">
             <label for="modeles_choice">Choisir un modele</label>
@@ -60,75 +63,87 @@
         </form>
         <script src="{{url_for('static', filename='on_parametre_change.js')}}"></script>
 
-    </div>
+        <!-- Zone du graphique -->
+        <div class="chart" id="bargraph"></div>
+        <p id="selected_text"></p>
 
-    <!-- Zone du graphique -->
-    <div class="chart" id="bargraph"></div>
-    <p id="selected_text"></p>
-
-    <!-- Zone de la bar de chargement -->
-    <div class="progress" id="progress" style="width:50%; margin: 50px;">
-        <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-            <span class="progress-bar-label">0%</span>
+        <!-- Zone de la bar de chargement -->
+        <div class="progress" id="progress" style="width:50%; margin: 50px;">
+            <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                <span class="progress-bar-label">0%</span>
+            </div>
         </div>
+
+        <!-- Script de la zone de chargement-->
+        {% if fichier_charge != "" %}
+        <script>
+            var graphique = document.getElementById("bargraph");
+            var progress = document.getElementById("progress");
+
+            // Lecteur d'évenement pour mettre a jour la barre de chargement
+            var source = new EventSource("/progress");
+            source.onmessage = function(event) {
+                graphique.style.display = "none";
+                progress.style.display = "block";
+
+                var data = JSON.parse(event.data)
+
+                console.log(event)
+                $('.progress-bar').css('width', data.progression+'%').attr('aria-valuenow', data.progression);
+                $('.progress-bar-label').text(data.progression+'%');
+
+                console.log(data.progression)
+
+                if(data.progression == 100){
+                    graphique.style.display = "block";
+                    progress.style.display = "none";
+                    source.close()
+                }
+            }
+
+            // Génération du graphique quand un fichier est sélectionné
+            fetch('/get-graph')
+            .then(r => r.json())
+            .then(data => {
+                var graphs = JSON.parse(data.graph);
+
+                var graphique_div = document.getElementById("bargraph");
+                var progress_div = document.getElementById("progress");
+                if (graphique_div.style.display == "none") {
+                    graphique_div.style.display = "block";
+                    progress_div.style.display = "none";
+                }
+                Plotly.plot('bargraph', graphs, {});
+
+                // Evenement quand on clique sur un point
+                var graphique = document.getElementById('bargraph');
+                var selected_text = '';
+
+                graphique.on('plotly_click', function(data){
+                    for(var i=0; i < data.points.length; i++){
+                        if (data.points[i].fullData.name == "appréciations générales") {
+                            selected_text = "Texte sélectionné : " +data.points[i].customdata
+                        }
+                    }
+
+                    var paragraph = document.getElementById("selected_text");
+                    paragraph.textContent = selected_text
+                });
+            });
+        </script>
+        {% endif %}
     </div>
 
-    <!-- Script de la zone de chargement-->
+    <!-- Affichage de graphique-zone -->
     {% if fichier_charge != "" %}
     <script>
-        // Début d'un lecteur d'évenement pour mettre a jour la barre de chargement
-        var graphique = document.getElementById("bargraph");
-        var progress = document.getElementById("progress");
-
-
-        var source = new EventSource("/progress");
-        source.onmessage = function(event) {
-            graphique.style.display = "none";
-            progress.style.display = "block";
-
-            var data = JSON.parse(event.data)
-            
-            console.log(event)
-            $('.progress-bar').css('width', data.progression+'%').attr('aria-valuenow', data.progression);
-            $('.progress-bar-label').text(data.progression+'%');
-
-            console.log(data.progression)
-    
-            if(data.progression == 100){
-                graphique.style.display = "block";
-                progress.style.display = "none";
-                source.close()
-            }
-        }
-        // Génération du graphqiue quand un fichier est sélectionné
-        fetch('/get-graph')
-        .then(r => r.json())
-        .then(data => {
-            var graphs = JSON.parse(data.graph);
-
-            var graphique_div = document.getElementById("bargraph");
-            var progress_div = document.getElementById("progress");
-            if (graphique_div.style.display == "none") {
-                graphique_div.style.display = "block";
-                progress_div.style.display = "none";
-            }
-            Plotly.plot('bargraph', graphs, {});
-
-            // Evenement quand on clique sur un point
-            var graphique = document.getElementById('bargraph');
-            var selected_text = '';
-
-            graphique.on('plotly_click', function(data){
-                for(var i=0; i < data.points.length; i++){
-                    if (data.points[i].fullData.name == "appréciations générales") {
-                        selected_text = "Texte sélectionné : " +data.points[i].customdata
-                    }
-                }
-
-                var paragraph = document.getElementById("selected_text");
-                paragraph.textContent = selected_text
-            });
-        });
+        graphique_zone = document.getElementById("graphique-zone")
+        graphique_zone.style.display = "block"
+    </script>
+    {% else %}
+    <script>
+        graphique_zone = document.getElementById("graphique-zone")
+        graphique_zone.style.display = "none"
     </script>
     {% endif %}
 </body>
