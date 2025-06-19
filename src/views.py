@@ -39,34 +39,23 @@ def index():
             modele_selectionne = request.form.get("modeles_choice")
             graphique.modifier_modele(modele_selectionne)
 
-
-
     return render_template("index.html",
                            fichier_charge=filename,
                            modeles_disponibles=modeles_disponibles,
                            fichiers_recents=fichiers_recents,
                            modele_selectionne=modele_selectionne)
 
-@app.route('/progress')
+@app.route('/progress') # Mettre a jour la bar de progression
 def progress():
     def generate():
         progression = graphique.chargement.progession
-        status = graphique.chargement.status
-        data = json.dumps({"progression": progression, "status":status})
+        statut = graphique.chargement.status
+        data = json.dumps({"progression": progression, "statut":statut})
         yield "data:" + str(data) + "\n\n"
     
     return Response(generate(), mimetype='text/event-stream')
 
-@app.route("/generate")
-def start_generation():
-    def run():
-        global graph
-        if (graphique.donnees.fichier != ""):
-            graph = graphique.generer()
-    threading.Thread(target=run).start()
-    return "Started"
-
-@app.route("/get-graph")
+@app.route("/get-graph") # Permetre de récupérer le graphique
 def get_graph():
     graph = ""
     if (graphique.donnees.fichier != ""):
