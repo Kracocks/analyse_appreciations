@@ -67,31 +67,33 @@ class Graphique:
             for trimestre in self.donnees.get_trimestres(annee_scolaire):
                 trimestres.append(trimestre)
 
-                if "moyennes générales" in self.variables: # Obtenir les moyennes générales
-                    self.chargement.status = "Récupération de la moyenne générale du " + trimestre + " de l'année scolaire " + annee_scolaire
-                    
-                    if not resultats.get("moyennes générales"):
-                        resultats["moyennes générales"] = []
-                    mg = self.donnees.get_moyenne(annee_scolaire, trimestre)
-                    resultats["moyennes générales"].append(mg)
-                    
-                    self.chargement.progession += 1 * 80 / nb_total_donnees
+                # Obtenir les moyennes générales
+                self.chargement.status = "Récupération de la moyenne générale du " + trimestre + " de l'année scolaire " + annee_scolaire
+                
+                if not resultats.get("moyennes générales"):
+                    resultats["moyennes générales"] = []
+                mg = self.donnees.get_moyenne(annee_scolaire, trimestre)
+                resultats["moyennes générales"].append(mg)
+                
+                self.chargement.progession += 1 * 80 / nb_total_donnees
 
-                if "appréciations générales" in self.variables: # Obtenir les appréciations générales
-                    self.chargement.status = "Récupération de l'appréciation générale du " + trimestre + " de l'année scolaire " + annee_scolaire
-                    if not resultats.get("appréciations générales"):
-                        resultats["appréciations générales"] = [] # Les scores des l'appréciations
-                        resultats["appreciations_generales_text"] = [] # Les textes des l'appréciations
-                    if self.donnees.score_existe(annee_scolaire, trimestre, self.modele_ia.nom_modele): # Si le score avec le modele choisi existe alors on prend le score
-                        score = self.donnees.get_score_appreciation(annee_scolaire, trimestre, self.modele_ia.nom_modele)
-                    else: # Sinon on fait le score et on le stocke dans le JSON
-                        ag = self.donnees.get_appreciation(annee_scolaire, trimestre)
-                        score = self.modele_ia.analyser(ag)
-                        self.donnees.set_score_appreciation(annee_scolaire, trimestre, self.modele_ia.nom_modele, score)
-                    resultats["appréciations générales"].append(score)
-                    resultats["appreciations_generales_text"].append(self.donnees.get_appreciation(annee_scolaire, trimestre))
+                # Obtenir les appréciations générales
+                self.chargement.status = "Récupération de l'appréciation générale du " + trimestre + " de l'année scolaire " + annee_scolaire
+                if not resultats.get("appréciations générales"):
+                    resultats["appréciations générales"] = [] # Les scores des l'appréciations
+                    resultats["appreciations_generales_text"] = [] # Les textes des l'appréciations
+                if self.donnees.get_appreciation(annee_scolaire, trimestre) == None or self.donnees.get_appreciation(annee_scolaire, trimestre) == "": # Si il n'y a pas l'appréciation
+                    score = None
+                elif self.donnees.score_existe(annee_scolaire, trimestre, self.modele_ia.nom_modele): # Si le score avec le modele choisi existe alors on prend le score
+                    score = self.donnees.get_score_appreciation(annee_scolaire, trimestre, self.modele_ia.nom_modele)
+                else: # Sinon on fait le score et on le stocke dans le JSON
+                    ag = self.donnees.get_appreciation(annee_scolaire, trimestre)
+                    score = self.modele_ia.analyser(ag)
+                    self.donnees.set_score_appreciation(annee_scolaire, trimestre, self.modele_ia.nom_modele, score)
+                resultats["appréciations générales"].append(score)
+                resultats["appreciations_generales_text"].append(self.donnees.get_appreciation(annee_scolaire, trimestre))
 
-                    self.chargement.progession += 1 * 80 / nb_total_donnees
+                self.chargement.progession += 1 * 80 / nb_total_donnees
 
                 print(self.chargement.progession)
         
@@ -103,7 +105,7 @@ class Graphique:
             match nom:
                 case "moyennes générales":
                     data.add_trace(go.Scatter(x=trimestres, y=valeurs,
-                                              mode='lines',
+                                              mode='lines+markers',
                                               name=nom,
                                               hovertemplate="%{y}"
                                             ))
@@ -111,7 +113,7 @@ class Graphique:
                 case "appréciations générales":
                     data.add_trace(go.Scatter(x=trimestres, y=valeurs,
                                               customdata=resultats["appreciations_generales_text"],
-                                              mode='lines',
+                                              mode='lines+markers',
                                               name=nom,
                                               hovertemplate="%{customdata}<br>score : %{y}"
                                             ))
