@@ -98,7 +98,6 @@ class Graphique:
                 print(self.chargement.progession)
                 
         #resultats = pd.DataFrame(resultats)
-        trimestres_manquants = []
         donnees_manquantes = dict()
         i = 0
         while i < len(trimestres):
