@@ -4,6 +4,7 @@ import plotly.graph_objs as go
 import numpy as np
 import pandas as pd
 from transformers import pipeline
+from datasets import load_dataset
 
 class Graphique:
     def __init__(self):
@@ -56,6 +57,14 @@ class Graphique:
         # Récupération des données
         self.chargement.progession = 0
         self.chargement.est_fini = False
+        self.chargement.status = "Evaluation des modèles d'IA"
+        
+        print("-----------------")
+        self.modele_ia.noter()
+        print("-----------------")
+        
+        self.chargement.progession = 10
+        
         self.chargement.status = "Récupération des données"
 
         nb_total_donnees = self.donnees.get_nb_total_donnees()
@@ -88,7 +97,7 @@ class Graphique:
                     score = self.donnees.get_score_appreciation(annee_scolaire, trimestre, self.modele_ia.nom_modele)
                 else: # Sinon on fait le score et on le stocke dans le JSON
                     ag = self.donnees.get_appreciation(annee_scolaire, trimestre)
-                    score = self.modele_ia.analyser(ag)
+                    score = self.modele_ia.analyser([ag])[0]
                     self.donnees.set_score_appreciation(annee_scolaire, trimestre, self.modele_ia.nom_modele, score)
                 resultats["appréciations générales"].append(score)
                 resultats["appreciations_generales_text"].append(self.donnees.get_appreciation(annee_scolaire, trimestre))
@@ -335,6 +344,7 @@ class ModeleIA:
             type_score (str): Le modele d'IA
         """
         self.nom_modele = type_score
+        self.modeles_disponibles = ["Peed911/french_sentiment_analysis", "ac0hik/Sentiment_Analysis_French"]
 
     def modifier_modele(self, new_nom_modele:str):
         """Modifier le modèle d'IA utilisé par l'application
@@ -344,21 +354,50 @@ class ModeleIA:
         """
         self.nom_modele = new_nom_modele
     
-    def analyser(self, texte:str) -> float:
+    def analyser(self, textes:list[str]) -> list[float]:
         """Analyse et donne un score /20 à un texte à partir du modele d'IA sélectionné
 
         Args:
-            texte (str): Le texte à analyser
+            textes (list[str]): Les textes à analyser
 
         Returns:
-            float: Le score /20 attribué au texte
+            list[float]: Les scores /20 attribué aux textes
         """
+        res = []
         pipe = pipeline("text-classification", model=self.nom_modele, top_k=None)
-        res = pipe(texte)
+        res = pipe(textes)
         for scores in res[0]:
             if scores["label"].upper() == "POSITIVE":
-                return scores["score"] *20
-            
+                res.append(scores["score"] * 20)
+        return res
+
+    def noter(self) -> float:
+        """Permet de noter automatiquement un modèle d'IA. Pour cela on va prendre un dataset sur HuggingFace 
+        qui est utilisé pour l'analyse de sentiment et on va utiliser l'IA sur ce dataset puis on va comparer le 
+        nombre de label positif que l'IA à donnée et comparé avec le nombre de label positif qu'il y a dans le dataset 
+
+        Returns:
+            float: Le taux de précision.
+        """
+        ds = load_dataset("eltorio/appreciation", split="validation")
+        
+        commentaires = ds["commentaire"][:15]
+        comportements = ds["comportement 0-10"][:15]
+        participations = ds["participation 0-10"][:15]
+        travails = ds["travail 0-10"][:15]
+        
+        for modele in self.modeles_disponibles:
+            scores = self.analyser(commentaires)
+
+            for i in range(len(comportements)):
+                score = scores[i]
+
+                total = comportements[i] + participations[i] + travails[i] # Le total vaut au maximum 30
+                print(str(total) + "/30")
+                # Mettre le résultat en %
+                pourcentage = total * 100 / 30
+                print(str(pourcentage) + "%")
+
 class Chargement:
     def __init__(self):
         self.progession = 0
