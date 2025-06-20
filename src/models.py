@@ -14,7 +14,7 @@ class Graphique:
         self.donnees = Donnees("")
         self.modele_ia = ModeleIA("")
         self.chargement = Chargement()
-        
+
     def ajouter_variable(self, var:str):
         """Ajouter une varible parmis les variables qui seront affiché dans le graphique
 
@@ -22,7 +22,7 @@ class Graphique:
             var (str): La variable à ajouter
         """
         self.variables.append(var)
-        
+
     def supprimer_variable(self, var:str):
         """Supprimer une varibles parmis les variables qui seront affiché sur le graphique
 
@@ -38,7 +38,7 @@ class Graphique:
             fichier (str): Le nouveau fichier utilisé
         """
         self.donnees.modfier_fichier(fichier)
-        
+
     def modifier_modele(self, modele:str):
         """Modifier le modèle d'IA utilisé pour donner un score au appréciations
 
@@ -46,7 +46,7 @@ class Graphique:
             modele (str): Le nouveau modèle d'IA
         """
         self.modele_ia.modifier_modele(modele)
-    
+
     def generer(self) -> str:
         """Génère un graphique à partir des données, variables et modèle d'IA
 
@@ -57,7 +57,7 @@ class Graphique:
         self.chargement.progession = 0
         self.chargement.est_fini = False
         self.chargement.status = "Récupération des données"
-        
+
         nb_total_donnees = self.donnees.get_nb_total_donnees()
         print("Nombre d'elements : ", nb_total_donnees)
         annees_scolaire = self.donnees.get_annees_scolaire()
@@ -69,12 +69,12 @@ class Graphique:
 
                 # Obtenir les moyennes générales
                 self.chargement.status = "Récupération de la moyenne générale du " + trimestre + " de l'année scolaire " + annee_scolaire
-                
+
                 if not resultats.get("moyennes générales"):
                     resultats["moyennes générales"] = []
                 mg = self.donnees.get_moyenne(annee_scolaire, trimestre)
                 resultats["moyennes générales"].append(mg)
-                
+
                 self.chargement.progession += 1 * 80 / nb_total_donnees
 
                 # Obtenir les appréciations générales
@@ -105,28 +105,30 @@ class Graphique:
                 if not "text" in nom: # On ne veux pas des textes
                     if (resultats[nom][i] == None):
                         j = i
-                        while j < len(trimestres):
-                            if (resultats[nom][j] != None):
-                                if (not donnees_manquantes.get(nom)):
-                                    donnees_manquantes[nom] = {"trimestres": [], "valeurs": []}
-                                # Début des données manquantes
-                                if (i > 0): # Si on est pas au début
-                                    donnees_manquantes[nom]["valeurs"].append(resultats[nom][i-1])
-                                    donnees_manquantes[nom]["trimestres"].append(trimestres[i-1])
-                                else:
-                                    donnees_manquantes[nom]["valeurs"].append(resultats[nom][i])
-                                    donnees_manquantes[nom]["trimestres"].append(trimestres[i])
-                                # Fin des données manquantes
-                                donnees_manquantes[nom]["valeurs"].append(resultats[nom][j])
-                                donnees_manquantes[nom]["trimestres"].append(trimestres[j])
+                        while j < len(trimestres) and resultats[nom][j] == None:
                             j += 1
+                        
+                        if (resultats[nom][j] != None):
+                            if (not donnees_manquantes.get(nom)):
+                                donnees_manquantes[nom] = {"trimestres": [], "valeurs": []}
+                            # Début des données manquantes
+                            if (i > 0): # Si on est pas au début
+                                donnees_manquantes[nom]["valeurs"].append(resultats[nom][i-1])
+                                donnees_manquantes[nom]["trimestres"].append(trimestres[i-1])
+                            else:
+                                donnees_manquantes[nom]["valeurs"].append(resultats[nom][i])
+                                donnees_manquantes[nom]["trimestres"].append(trimestres[i])
+                            # Fin des données manquantes
+                            donnees_manquantes[nom]["valeurs"].append(resultats[nom][j])
+                            donnees_manquantes[nom]["trimestres"].append(trimestres[j])
+                            
             i += 1
-        
+
         # Création du graphique
         self.chargement.status = "Création du graphique"
 
         data = go.Figure(layout_yaxis_range=[0,20])
-        for nom, valeurs in resultats.items(): 
+        for nom, valeurs in resultats.items():
             match nom:
                 case "moyennes générales":
                     data.add_trace(go.Scatter(x=trimestres, y=valeurs,
@@ -144,7 +146,7 @@ class Graphique:
                                               name=nom,
                                               legendgroup=nom,
                                               legendgrouptitle={'text': nom},
-                                              hovertemplate="%{customdata}<br>score : %{y}"                                            
+                                              hovertemplate="%{customdata}<br>score : %{y}"
                                             ))
 
                 case "appreciations_generales_text":
@@ -168,8 +170,7 @@ class Graphique:
         self.chargement.est_fini = True
 
         return graphJSON
-        
-    
+
 class Donnees:
     def __init__(self, fichier:str):
         """Le constructeur de la classe Donnees
@@ -206,7 +207,7 @@ class Donnees:
         """
         # TODO Faire la vérification du contenu du fichier
         return True
-    
+
     def get_annees_scolaire(self) -> list[str]:
         """Permet d'avoir toute les années scolaire enregistré dans le fichier
 
@@ -217,7 +218,7 @@ class Donnees:
         for annee in self.donnees.get("annees_scolaire"):
             annees.append(annee)
         return annees
-    
+
     def get_trimestres(self, annee_scolaire:str) -> list[str]:
         """Permet d'avoir tout les trimestre enregistré d'une année scolaire
 
@@ -231,7 +232,7 @@ class Donnees:
         for trimestre in self.donnees["annees_scolaire"][annee_scolaire]["trimestres"]:
             trimestres.append(trimestre)
         return trimestres
-    
+
     def get_moyenne(self, annee_scolaire:str, trimestre:str, matiere:str=None) -> float:
         """Permet d'obtenir la moyenne à partir de l'année scolaire et du trimestre sélectionné. Si aucune matière n'est sélectionné, on choisi la moyenne générale sinon on choisi la moyenne de la matière
 
@@ -246,7 +247,7 @@ class Donnees:
         if matiere:
             return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["moyenne"]
         return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["moyenne_generale"]
-    
+
     def get_appreciation(self, annee_scolaire:str, trimestre:str, matiere:str = None) -> str:
         """Permet d'obtenir l'appréciation à partir de l'année scolaire et du trimestre sélectionné. Si aucune matière n'est sélectionné, on choisi l'appréciation générale sinon on choisi la moyenne de l'appréciation
 
@@ -261,7 +262,7 @@ class Donnees:
         if matiere:
             return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["appreciation"]
         return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["appreciation_generale"]
-    
+
     def get_score_appreciation(self, annee_scolaire:str, trimestre:str, modele_ia:str, matiere:str = None) -> float:
         """Permet d'obtenir le score d'une appreciation à partir de l'année scolaire et du trimestre sélectionné. Si aucune matière n'est sélectionné, on choisi le score de l'appréciation générale sinon on choisi le score de l'appréciation de la matière choisi
 
@@ -277,7 +278,7 @@ class Donnees:
         if matiere:
             return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["appreciation_score_" + modele_ia]
         return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["appreciation_generale_score_" + modele_ia]
-    
+
     def score_existe(self, annee_scolaire:str, trimestre:str, modele_ia:str, matiere:str = None) -> bool:
         """Permet de savoir si le score d'une appréciation à déjà été calculé
 
@@ -294,8 +295,7 @@ class Donnees:
             return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere].get("appreciation_score_" + modele_ia) != None
         else:
             return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre].get("appreciation_generale_score_" + modele_ia) != None
-            
-    
+
     def set_score_appreciation(self, annee_scolaire:str, trimestre:str, modele_ia:str, score:float, matiere:str = None):
         """Ajoute le score dans le JSON
 
@@ -314,7 +314,7 @@ class Donnees:
             f.seek(0)
             json.dump(self.donnees, f, indent=4)
             f.truncate()
-    
+
     def get_nb_total_donnees(self) -> int:
         total = 0
         for annee_scolaire in self.donnees["annees_scolaire"]:
@@ -326,7 +326,7 @@ class Donnees:
                 total += (len(self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]) - 2) + len(self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"]) * 2
         
         return total
-    
+
 class ModeleIA:
     def __init__(self, type_score:str):
         """Le constructeur de la classe ModeleIA
@@ -335,7 +335,7 @@ class ModeleIA:
             type_score (str): Le modele d'IA
         """
         self.nom_modele = type_score
-        
+
     def modifier_modele(self, new_nom_modele:str):
         """Modifier le modèle d'IA utilisé par l'application
 
