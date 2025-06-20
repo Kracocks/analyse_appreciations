@@ -120,39 +120,44 @@ class Graphique:
                                 donnees_manquantes[nom]["valeurs"].append(resultats[nom][j])
                                 donnees_manquantes[nom]["trimestres"].append(trimestres[j])
                             j += 1
-            print(donnees_manquantes)
             i += 1
         
         # Création du graphique
         self.chargement.status = "Création du graphique"
-        
+
         data = go.Figure(layout_yaxis_range=[0,20])
-        for nom, valeurs in resultats.items():
+        for nom, valeurs in resultats.items(): 
             match nom:
                 case "moyennes générales":
                     data.add_trace(go.Scatter(x=trimestres, y=valeurs,
                                               mode='lines+markers',
                                               name=nom,
+                                              legendgroup=nom,
+                                              legendgrouptitle={'text': nom},
                                               hovertemplate="%{y}"
                                             ))
 
                 case "appréciations générales":
-                    data.add_trace(go.Scatter(x=trimestres, y=valeurs,
+                    test = data.add_trace(go.Scatter(x=trimestres, y=valeurs,
                                               customdata=resultats["appreciations_generales_text"],
                                               mode='lines+markers',
                                               name=nom,
-                                              hovertemplate="%{customdata}<br>score : %{y}"
+                                              legendgroup=nom,
+                                              legendgrouptitle={'text': nom},
+                                              hovertemplate="%{customdata}<br>score : %{y}"                                            
                                             ))
 
                 case "appreciations_generales_text":
                     pass
-        
+
         #Affichage ligne pour données manquantes     
         for nom, valeurs in donnees_manquantes.items():
             data.add_trace(go.Scatter(
                 x=valeurs["trimestres"], y=valeurs["valeurs"],
                 mode="lines",
-                name=nom,
+                name=nom + " (donnée(s) manquante(s))",
+                legendgroup=nom,
+                legendgrouptitle={'text': nom},
                 hoverinfo="skip",
                 line=dict(dash= "longdash")
             ))
