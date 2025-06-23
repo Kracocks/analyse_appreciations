@@ -5,8 +5,7 @@ import numpy as np
 import pandas as pd
 from transformers import pipeline
 from datasets import load_dataset
-
-import time
+from math import sqrt
 
 class Graphique:
     def __init__(self):
@@ -368,10 +367,11 @@ class ModeleIA:
         """
         res = []
         pipe = self.modeles_disponibles[self.modele_choisi]
-        res = pipe(textes)
-        for scores in res[0]:
-            if scores["label"].upper() == "POSITIVE":
-                res.append(scores["score"] * 20)
+        scores = pipe(textes)
+        for score in scores:
+            for score in score:
+                if score["label"].upper() == "POSITIVE":
+                    res.append((score["score"] * 20))
         return res
 
     def noter(self) -> float:
