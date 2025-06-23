@@ -3,11 +3,10 @@ import plotly
 import plotly.graph_objs as go
 import numpy as np
 import pandas as pd
-from sentence_transformers import SentenceTransformer
 from transformers import pipeline
 from datasets import load_dataset
-from .app import mkpath
-import os.path
+
+import time
 
 class Graphique:
     def __init__(self):
@@ -347,8 +346,8 @@ class ModeleIA:
             modele_choisi (str): Le modele d'IA
         """
         self.modele_choisi = modele_choisi
-        self.modeles_disponibles = ["Peed911/french_sentiment_analysis", "ac0hik/Sentiment_Analysis_French"]
-        self.upload_models()
+        self.modeles_disponibles = {"Peed911/french_sentiment_analysis": pipeline("text-classification", model="Peed911/french_sentiment_analysis", top_k=None),
+                                    "ac0hik/Sentiment_Analysis_French" : pipeline("text-classification", model="ac0hik/Sentiment_Analysis_French", top_k=None)}
 
     def modifier_modele(self, new_nom_modele:str):
         """Modifier le modèle d'IA utilisé par l'application
@@ -368,7 +367,7 @@ class ModeleIA:
             list[float]: Les scores /20 attribué aux textes
         """
         res = []
-        pipe = pipeline("text-classification", model=self.modele_choisi, top_k=None)
+        pipe = self.modeles_disponibles[self.modele_choisi]
         res = pipe(textes)
         for scores in res[0]:
             if scores["label"].upper() == "POSITIVE":
@@ -390,7 +389,7 @@ class ModeleIA:
         participations = ds["participation 0-10"][:15]
         travails = ds["travail 0-10"][:15]
         
-        for modele in self.modeles_disponibles:
+        for modele in self.modeles_disponibles.keys():
             scores = self.analyser(commentaires)
 
             for i in range(len(comportements)):
@@ -401,14 +400,6 @@ class ModeleIA:
                 # Mettre le résultat en %
                 pourcentage = total * 100 / 30
                 print(str(pourcentage) + "%")
-                
-    def upload_models(self):
-        modeles_chargee = os.listdir("./models/")
-        for model_disponible in self.modeles_disponibles:
-            if model_disponible not in modeles_chargee:
-                mkpath("./models/"+model_disponible)
-                model = SentenceTransformer(model_disponible)
-                model.save("./models/"+model_disponible)
 
 class Chargement:
     def __init__(self):

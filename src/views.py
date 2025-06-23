@@ -8,7 +8,7 @@ import json
 
 graphique = Graphique()
 
-modeles_disponibles = graphique.modele_ia.modeles_disponibles
+modeles_disponibles = list(graphique.modele_ia.modeles_disponibles.keys())
 
 graphique.modifier_modele(modeles_disponibles[0])
 
@@ -16,7 +16,7 @@ graphique.modifier_modele(modeles_disponibles[0])
 def index():
     fichiers_recents = [f for f in os.listdir("./uploaded_files/") if os.path.isfile(os.path.join("./uploaded_files/", f))]
     filename = graphique.donnees.fichier
-    modele_selectionne = graphique.modele_ia.nom_modele if graphique.modele_ia.nom_modele != "" else modeles_disponibles[0]
+    modele_selectionne = graphique.modele_ia.modele_choisi if graphique.modele_ia.modele_choisi != "" else modeles_disponibles[0]
 
     if request.method == 'POST':
 
