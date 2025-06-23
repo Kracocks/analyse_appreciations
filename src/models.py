@@ -392,17 +392,48 @@ class ModeleIA:
         for modele in self.modeles_disponibles.keys():
             scores = self.analyser(commentaires)
 
+            notes = []
             for i in range(len(comportements)):
-                score = scores[i]
-
                 total = comportements[i] + participations[i] + travails[i] # Le total vaut au maximum 30
-                print(str(total) + "/30")
-                # Mettre le résultat en %
-                pourcentage = total * 100 / 30
-                print(str(pourcentage) + "%")
+                # Mettre le résultat sur 20
+                note = total * 20 / 30
+                notes.append(note)
+            
+            print(correlation(scores, notes))
 
 class Chargement:
     def __init__(self):
         self.progession = 0
         self.est_fini = False
         self.status = ""
+        
+        
+        
+def correlation(prem_ensemble:list, deux_ensemble:list):
+    if len(prem_ensemble) != len(deux_ensemble):
+        return None
+
+    moyenne_prem_ensemble = 0
+    moyenne_deux_ensemble = 0
+    for i in range(len(prem_ensemble)):
+        moyenne_prem_ensemble += prem_ensemble[i]
+        moyenne_deux_ensemble += deux_ensemble[i]
+    moyenne_prem_ensemble = moyenne_prem_ensemble / len(prem_ensemble)
+    moyenne_deux_ensemble = moyenne_deux_ensemble / len(deux_ensemble)
+
+    distances_prem_ensemble = []
+    distances_deux_ensemble = []
+    for i in range(len(prem_ensemble)):
+        distances_prem_ensemble.append(prem_ensemble[i] - moyenne_prem_ensemble)
+        distances_deux_ensemble.append(deux_ensemble[i] - moyenne_deux_ensemble)
+
+    haut_equation = 0
+    bas_equation_prem_ensemble = 0
+    bas_equation_deux_ensemble = 0
+    for i in range(len(distances_prem_ensemble)):
+        haut_equation += distances_prem_ensemble[i] * distances_deux_ensemble[i]
+        bas_equation_prem_ensemble += (distances_prem_ensemble[i]**2)
+        bas_equation_deux_ensemble += (distances_deux_ensemble[i]**2)
+    bas_equation = sqrt(bas_equation_prem_ensemble*bas_equation_deux_ensemble)
+
+    return haut_equation / bas_equation
