@@ -3,8 +3,11 @@ import plotly
 import plotly.graph_objs as go
 import numpy as np
 import pandas as pd
+from sentence_transformers import SentenceTransformer
 from transformers import pipeline
 from datasets import load_dataset
+from .app import mkpath
+import os.path
 
 class Graphique:
     def __init__(self):
@@ -93,12 +96,12 @@ class Graphique:
                     resultats["appreciations_generales_text"] = [] # Les textes des l'appréciations
                 if self.donnees.get_appreciation(annee_scolaire, trimestre) == None or self.donnees.get_appreciation(annee_scolaire, trimestre) == "": # Si il n'y a pas l'appréciation
                     score = None
-                elif self.donnees.score_existe(annee_scolaire, trimestre, self.modele_ia.nom_modele): # Si le score avec le modele choisi existe alors on prend le score
-                    score = self.donnees.get_score_appreciation(annee_scolaire, trimestre, self.modele_ia.nom_modele)
+                elif self.donnees.score_existe(annee_scolaire, trimestre, self.modele_ia.modele_choisi): # Si le score avec le modele choisi existe alors on prend le score
+                    score = self.donnees.get_score_appreciation(annee_scolaire, trimestre, self.modele_ia.modele_choisi)
                 else: # Sinon on fait le score et on le stocke dans le JSON
                     ag = self.donnees.get_appreciation(annee_scolaire, trimestre)
                     score = self.modele_ia.analyser([ag])[0]
-                    self.donnees.set_score_appreciation(annee_scolaire, trimestre, self.modele_ia.nom_modele, score)
+                    self.donnees.set_score_appreciation(annee_scolaire, trimestre, self.modele_ia.modele_choisi, score)
                 resultats["appréciations générales"].append(score)
                 resultats["appreciations_generales_text"].append(self.donnees.get_appreciation(annee_scolaire, trimestre))
 
@@ -337,14 +340,15 @@ class Donnees:
         return total
 
 class ModeleIA:
-    def __init__(self, type_score:str):
+    def __init__(self, modele_choisi:str):
         """Le constructeur de la classe ModeleIA
 
         Args:
-            type_score (str): Le modele d'IA
+            modele_choisi (str): Le modele d'IA
         """
-        self.nom_modele = type_score
+        self.modele_choisi = modele_choisi
         self.modeles_disponibles = ["Peed911/french_sentiment_analysis", "ac0hik/Sentiment_Analysis_French"]
+        self.upload_models()
 
     def modifier_modele(self, new_nom_modele:str):
         """Modifier le modèle d'IA utilisé par l'application
@@ -352,7 +356,7 @@ class ModeleIA:
         Args:
             new_nom_modele (str): Le nouveau modèle d'IA utilisé
         """
-        self.nom_modele = new_nom_modele
+        self.modele_choisi = new_nom_modele
     
     def analyser(self, textes:list[str]) -> list[float]:
         """Analyse et donne un score /20 à un texte à partir du modele d'IA sélectionné
@@ -364,7 +368,7 @@ class ModeleIA:
             list[float]: Les scores /20 attribué aux textes
         """
         res = []
-        pipe = pipeline("text-classification", model=self.nom_modele, top_k=None)
+        pipe = pipeline("text-classification", model=self.modele_choisi, top_k=None)
         res = pipe(textes)
         for scores in res[0]:
             if scores["label"].upper() == "POSITIVE":
@@ -397,6 +401,14 @@ class ModeleIA:
                 # Mettre le résultat en %
                 pourcentage = total * 100 / 30
                 print(str(pourcentage) + "%")
+                
+    def upload_models(self):
+        modeles_chargee = os.listdir("./models/")
+        for model_disponible in self.modeles_disponibles:
+            if model_disponible not in modeles_chargee:
+                mkpath("./models/"+model_disponible)
+                model = SentenceTransformer(model_disponible)
+                model.save("./models/"+model_disponible)
 
 class Chargement:
     def __init__(self):
