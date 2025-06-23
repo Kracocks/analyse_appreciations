@@ -376,9 +376,10 @@ class ModeleIA:
         return res
 
     def noter(self) -> float:
-        """Permet de noter automatiquement un modèle d'IA. Pour cela on va prendre un dataset sur HuggingFace 
-        qui est utilisé pour l'analyse de sentiment et on va utiliser l'IA sur ce dataset puis on va comparer le 
-        nombre de label positif que l'IA à donnée et comparé avec le nombre de label positif qu'il y a dans le dataset 
+        """Permet de noter automatiquement un modèle d'IA. Pour cela on va prendre le dataset eltorio/appreciation sur HuggingFace 
+        qui est utilisé pour lister des appréciations et leur donner un score sur 10 sur 3 catégories : le comportement, la participation et 
+        le travail. Ensuite on va donner ces appréciations aux modèles d'IA qui vont nous donner une liste de scores sur 20 puis on va mettres 
+        les 3 notes en une notes sur 20. Pour finir on va calculer le coefficient de correlation en les scores que nous ont donné les IA.
 
         Returns:
             float: Le taux de précision.
