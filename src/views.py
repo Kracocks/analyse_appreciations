@@ -14,7 +14,7 @@ graphique.modifier_modele(modeles_disponibles[0])
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    fichiers_recents = [f for f in os.listdir("./uploaded_files/") if os.path.isfile(os.path.join("./uploaded_files/", f))]
+    fichiers_recents = [f for f in os.listdir(app.config["UPLOAD_PATH"]) if os.path.isfile(os.path.join(app.config["UPLOAD_PATH"], f))]
     filename = graphique.donnees.fichier
     modele_selectionne = graphique.modele_ia.modele_choisi if graphique.modele_ia.modele_choisi != "" else modeles_disponibles[0]
 
@@ -24,13 +24,13 @@ def index():
 
         if file:
             filename = secure_filename(file.filename)
-            file.save(os.path.join("./uploaded_files/", filename))
-            graphique.modifier_donnees(os.path.join("./uploaded_files/", filename))
+            file.save(os.path.join(app.config["UPLOAD_PATH"], filename))
+            graphique.modifier_donnees(os.path.join(app.config["UPLOAD_PATH"], filename))
 
         # Selection d'un fichier récemment utilisé
         elif request.form.get("recent_files_choice"):
             filename = request.form.get("recent_files_choice")
-            graphique.modifier_donnees(os.path.join("./uploaded_files/", filename))
+            graphique.modifier_donnees(os.path.join(app.config["UPLOAD_PATH"], filename))
 
         # Réafficher le tableau
         if request.form.get("modeles_choice"):

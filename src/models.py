@@ -383,12 +383,12 @@ class ModeleIA:
             float: Le taux de précision.
         """
         ds = load_dataset("eltorio/appreciation", split="validation")
-        
+
         commentaires = ds["commentaire"][:15]
         comportements = ds["comportement 0-10"][:15]
         participations = ds["participation 0-10"][:15]
         travails = ds["travail 0-10"][:15]
-        
+
         for modele in self.modeles_disponibles.keys():
             scores = self.analyser(commentaires)
 

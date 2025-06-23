@@ -17,6 +17,8 @@ app.config.update(
     DROPZONE_SERVER_ERROR = 'Problème serveur : code d\'erreur {{statusCode}}',
     DROPZONE_BROWSER_UNSUPPORTED = 'Votre navigateur ne supporte pas le glisser-déposer',
     DROPZONE_MAX_FILE_EXCEED = 'Vous ne pouvez pas importer plus de fichier',
+    
+    UPLOAD_PATH = "uploads",
 )
 
 dropzone = Dropzone(app)
