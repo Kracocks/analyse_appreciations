@@ -356,17 +356,18 @@ class ModeleIA:
         """
         self.modele_choisi = new_nom_modele
     
-    def analyser(self, textes:list[str]) -> list[float]:
+    def analyser(self, textes:list[str], modele:str = None) -> list[float]:
         """Analyse et donne un score /20 à un texte à partir du modele d'IA sélectionné
 
         Args:
             textes (list[str]): Les textes à analyser
+            modele (str, optional): Le modèle à utiliser. Si aucun, prendre modele_choisi dans la classe. None par défault.
 
         Returns:
             list[float]: Les scores /20 attribué aux textes
         """
         res = []
-        pipe = self.modeles_disponibles[self.modele_choisi]
+        pipe = self.modeles_disponibles[modele if modele != None else self.modele_choisi]
         scores = pipe(textes)
         for score in scores:
             for score in score:
@@ -384,13 +385,14 @@ class ModeleIA:
         """
         ds = load_dataset("eltorio/appreciation", split="validation")
 
-        commentaires = ds["commentaire"][:15]
-        comportements = ds["comportement 0-10"][:15]
-        participations = ds["participation 0-10"][:15]
-        travails = ds["travail 0-10"][:15]
+        commentaires = ds["commentaire"]
+        comportements = ds["comportement 0-10"]
+        participations = ds["participation 0-10"]
+        travails = ds["travail 0-10"]
 
+        resultats = dict()
         for modele in self.modeles_disponibles.keys():
-            scores = self.analyser(commentaires)
+            scores = self.analyser(commentaires, modele)
 
             notes = []
             for i in range(len(comportements)):
@@ -398,42 +400,15 @@ class ModeleIA:
                 # Mettre le résultat sur 20
                 note = total * 20 / 30
                 notes.append(note)
-            
-            print(correlation(scores, notes))
+
+            x = pd.Series(scores)
+            y = pd.Series(notes)
+            resultats[modele] = x.corr(y)
+        return resultats
 
 class Chargement:
     def __init__(self):
         self.progession = 0
         self.est_fini = False
         self.status = ""
-        
-        
-        
-def correlation(prem_ensemble:list, deux_ensemble:list):
-    if len(prem_ensemble) != len(deux_ensemble):
-        return None
 
-    moyenne_prem_ensemble = 0
-    moyenne_deux_ensemble = 0
-    for i in range(len(prem_ensemble)):
-        moyenne_prem_ensemble += prem_ensemble[i]
-        moyenne_deux_ensemble += deux_ensemble[i]
-    moyenne_prem_ensemble = moyenne_prem_ensemble / len(prem_ensemble)
-    moyenne_deux_ensemble = moyenne_deux_ensemble / len(deux_ensemble)
-
-    distances_prem_ensemble = []
-    distances_deux_ensemble = []
-    for i in range(len(prem_ensemble)):
-        distances_prem_ensemble.append(prem_ensemble[i] - moyenne_prem_ensemble)
-        distances_deux_ensemble.append(deux_ensemble[i] - moyenne_deux_ensemble)
-
-    haut_equation = 0
-    bas_equation_prem_ensemble = 0
-    bas_equation_deux_ensemble = 0
-    for i in range(len(distances_prem_ensemble)):
-        haut_equation += distances_prem_ensemble[i] * distances_deux_ensemble[i]
-        bas_equation_prem_ensemble += (distances_prem_ensemble[i]**2)
-        bas_equation_deux_ensemble += (distances_deux_ensemble[i]**2)
-    bas_equation = sqrt(bas_equation_prem_ensemble*bas_equation_deux_ensemble)
-
-    return haut_equation / bas_equation
