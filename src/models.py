@@ -6,6 +6,7 @@ import pandas as pd
 from transformers import pipeline
 from datasets import load_dataset
 from math import sqrt
+import time
 
 class Graphique:
     def __init__(self):
@@ -58,14 +59,6 @@ class Graphique:
         # Récupération des données
         self.chargement.progession = 0
         self.chargement.est_fini = False
-        self.chargement.status = "Evaluation des modèles d'IA"
-        
-        print("-----------------")
-        self.modele_ia.noter()
-        print("-----------------")
-        
-        self.chargement.progession = 10
-        
         self.chargement.status = "Récupération des données"
 
         nb_total_donnees = self.donnees.get_nb_total_donnees()
@@ -89,19 +82,19 @@ class Graphique:
 
                 # Obtenir les appréciations générales
                 self.chargement.status = "Récupération de l'appréciation générale du " + trimestre + " de l'année scolaire " + annee_scolaire
-                if not resultats.get("appréciations générales"):
+                appreciation = self.donnees.get_appreciation(annee_scolaire, trimestre)
+                if not resultats.get("appréciations générales") != None:
                     resultats["appréciations générales"] = [] # Les scores des l'appréciations
                     resultats["appreciations_generales_text"] = [] # Les textes des l'appréciations
-                if self.donnees.get_appreciation(annee_scolaire, trimestre) == None or self.donnees.get_appreciation(annee_scolaire, trimestre) == "": # Si il n'y a pas l'appréciation
+                if appreciation == None or appreciation == "": # Si il n'y a pas l'appréciation
                     score = None
                 elif self.donnees.score_existe(annee_scolaire, trimestre, self.modele_ia.modele_choisi): # Si le score avec le modele choisi existe alors on prend le score
                     score = self.donnees.get_score_appreciation(annee_scolaire, trimestre, self.modele_ia.modele_choisi)
                 else: # Sinon on fait le score et on le stocke dans le JSON
-                    ag = self.donnees.get_appreciation(annee_scolaire, trimestre)
-                    score = self.modele_ia.analyser([ag])[0]
+                    score = self.modele_ia.analyser([appreciation])[0]
                     self.donnees.set_score_appreciation(annee_scolaire, trimestre, self.modele_ia.modele_choisi, score)
                 resultats["appréciations générales"].append(score)
-                resultats["appreciations_generales_text"].append(self.donnees.get_appreciation(annee_scolaire, trimestre))
+                resultats["appreciations_generales_text"].append(appreciation)
 
                 self.chargement.progession += 1 * 80 / nb_total_donnees
 
@@ -347,6 +340,8 @@ class ModeleIA:
         self.modele_choisi = modele_choisi
         self.modeles_disponibles = {"Peed911/french_sentiment_analysis": pipeline("text-classification", model="Peed911/french_sentiment_analysis", top_k=None),
                                     "ac0hik/Sentiment_Analysis_French" : pipeline("text-classification", model="ac0hik/Sentiment_Analysis_French", top_k=None)}
+        self.notes = self.noter()
+        print(self.notes)
 
     def modifier_modele(self, new_nom_modele:str):
         """Modifier le modèle d'IA utilisé par l'application
@@ -384,12 +379,13 @@ class ModeleIA:
         Returns:
             float: Le taux de précision.
         """
-        ds = load_dataset("eltorio/appreciation", split="validation")
-
-        commentaires = ds["commentaire"]
-        comportements = ds["comportement 0-10"]
-        participations = ds["participation 0-10"]
-        travails = ds["travail 0-10"]
+        dstrain = load_dataset("eltorio/appreciation", split="train")
+        dsvalid = load_dataset("eltorio/appreciation", split="validation")
+        
+        commentaires = dstrain["commentaire"] + dsvalid["commentaire"]
+        comportements = dstrain["comportement 0-10"] + dsvalid["comportement 0-10"]
+        participations = dstrain["participation 0-10"] + dsvalid["participation 0-10"]
+        travails = dstrain["travail 0-10"] + dsvalid["travail 0-10"]
 
         resultats = dict()
         for modele in self.modeles_disponibles.keys():
@@ -404,7 +400,7 @@ class ModeleIA:
 
             x = pd.Series(scores)
             y = pd.Series(notes)
-            resultats[modele] = x.corr(y)
+            resultats[modele] = float(x.corr(y))
         return resultats
 
 class Chargement:
@@ -412,4 +408,3 @@ class Chargement:
         self.progession = 0
         self.est_fini = False
         self.status = ""
-
