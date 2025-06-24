@@ -60,6 +60,8 @@ class Graphique:
         self.chargement.progession = 0
         self.chargement.est_fini = False
         self.chargement.status = "Récupération des données"
+        
+        start_time = time.time()
 
         nb_total_donnees = self.donnees.get_nb_total_donnees()
         print("Nombre d'elements : ", nb_total_donnees)
@@ -86,21 +88,43 @@ class Graphique:
                 if not resultats.get("appréciations générales") != None:
                     resultats["appréciations générales"] = [] # Les scores des l'appréciations
                     resultats["appreciations_generales_text"] = [] # Les textes des l'appréciations
-                if appreciation == None or appreciation == "": # Si il n'y a pas l'appréciation
-                    score = None
-                elif self.donnees.score_existe(annee_scolaire, trimestre, self.modele_ia.modele_choisi): # Si le score avec le modele choisi existe alors on prend le score
-                    score = self.donnees.get_score_appreciation(annee_scolaire, trimestre, self.modele_ia.modele_choisi)
-                else: # Sinon on fait le score et on le stocke dans le JSON
-                    score = self.modele_ia.analyser([appreciation])[0]
-                    self.donnees.set_score_appreciation(annee_scolaire, trimestre, self.modele_ia.modele_choisi, score)
-                resultats["appréciations générales"].append(score)
+                # if appreciation == None or appreciation == "": # Si il n'y a pas l'appréciation
+                #     score = None
+                # elif self.donnees.score_existe(annee_scolaire, trimestre, self.modele_ia.modele_choisi): # Si le score avec le modele choisi existe alors on prend le score
+                #     score = self.donnees.get_score_appreciation(annee_scolaire, trimestre, self.modele_ia.modele_choisi)
+                # else: # Sinon on fait le score et on le stocke dans le JSON
+                #     score = self.modele_ia.analyser([appreciation])[0]
+                #     self.donnees.set_score_appreciation(annee_scolaire, trimestre, self.modele_ia.modele_choisi, score)
+                # resultats["appréciations générales"].append(score)
                 resultats["appreciations_generales_text"].append(appreciation)
 
                 self.chargement.progession += 1 * 80 / nb_total_donnees
 
                 print(self.chargement.progession)
+
+        # Récupération des scores
+        vals_existes = [] # Les valeurs qui ne sont pas à None
+        ind_val_existe = [] # L'indice des valeurs qui ne sont pas à None
+        result = [None] * len(resultats["appreciations_generales_text"]) # Ce qui va être utilisé pour afficher le graphique
+        for i in range(len(resultats["appreciations_generales_text"])):
+            if resultats["appreciations_generales_text"][i] != None:
+                ind_val_existe.append(i)
+                vals_existes.append(resultats["appreciations_generales_text"][i])
+        scores = self.modele_ia.analyser(vals_existes)
+
+        # Mettre les données manquante dans la liste
+        j = 0
+        for i in range(len(result)):
+            if i in ind_val_existe:
+                result[i] = scores[j]
+                j += 1
+            
+        resultats["appréciations générales"] = result
                 
-        #resultats = pd.DataFrame(resultats)
+        end_time = time.time()
+        
+        print("TIME : ", end_time-start_time)
+        
         donnees_manquantes = dict()
         i = 0
         while i < len(trimestres):
