@@ -57,7 +57,7 @@
             <label for="modeles_choice">Choisir un modele</label>
             <select name="modeles_choice" id="modeles_choice">
                 {% for modele in modeles_disponibles %}
-                <option value="{{ modele }}" {% if modele==modele_selectionne %}selected{% endif %}>{{ modele }}</option>
+                <option value="{{ modele }}" {% if modele==modele_selectionne %}selected{% endif %}>{{ modele }} ; note : {{ notes_ia[modele] }}</option>
                 {% endfor %}
             </select>
         </form>

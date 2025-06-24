@@ -41,7 +41,8 @@ def index():
                            fichier_charge=filename,
                            modeles_disponibles=modeles_disponibles,
                            fichiers_recents=fichiers_recents,
-                           modele_selectionne=modele_selectionne)
+                           modele_selectionne=modele_selectionne,
+                           notes_ia=graphique.modele_ia.notes)
 
 @app.route('/progress') # Mettre a jour la bar de progression
 def progress():

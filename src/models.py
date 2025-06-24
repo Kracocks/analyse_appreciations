@@ -341,7 +341,6 @@ class ModeleIA:
         self.modeles_disponibles = {"Peed911/french_sentiment_analysis": pipeline("text-classification", model="Peed911/french_sentiment_analysis", top_k=None),
                                     "ac0hik/Sentiment_Analysis_French" : pipeline("text-classification", model="ac0hik/Sentiment_Analysis_French", top_k=None)}
         self.notes = self.noter()
-        print(self.notes)
 
     def modifier_modele(self, new_nom_modele:str):
         """Modifier le modèle d'IA utilisé par l'application
@@ -400,7 +399,7 @@ class ModeleIA:
 
             x = pd.Series(scores)
             y = pd.Series(notes)
-            resultats[modele] = float(x.corr(y))
+            resultats[modele] = format(float(x.corr(y)), '5g')
         return resultats
 
 class Chargement:
