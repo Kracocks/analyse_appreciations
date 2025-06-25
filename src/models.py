@@ -60,12 +60,13 @@ class Graphique:
         self.chargement.progession = 0
         self.chargement.est_fini = False
         self.chargement.status = "Récupération des données"
-        
+
         start_time = time.time()
 
         nb_total_donnees = self.donnees.get_nb_total_donnees()
         print("Nombre d'elements : ", nb_total_donnees)
         annees_scolaire = self.donnees.get_annees_scolaire()
+        matieres = self.donnees.get_all_matieres()
         trimestres = []
         resultats = dict()
         for annee_scolaire in annees_scolaire:
@@ -75,7 +76,7 @@ class Graphique:
                 # Obtenir les moyennes générales
                 self.chargement.status = "Récupération de la moyenne générale du " + trimestre + " de l'année scolaire " + annee_scolaire
 
-                if not resultats.get("moyennes générales"):
+                if resultats.get("moyennes générales") == None:
                     resultats["moyennes générales"] = []
                 mg = self.donnees.get_moyenne(annee_scolaire, trimestre)
                 resultats["moyennes générales"].append(mg)
@@ -85,70 +86,94 @@ class Graphique:
                 # Obtenir les appréciations générales
                 self.chargement.status = "Récupération de l'appréciation générale du " + trimestre + " de l'année scolaire " + annee_scolaire
                 appreciation = self.donnees.get_appreciation(annee_scolaire, trimestre)
-                if not resultats.get("appréciations générales") != None:
-                    resultats["appréciations générales"] = [] # Les scores des l'appréciations
-                    resultats["appreciations_generales_text"] = [] # Les textes des l'appréciations
-                # if appreciation == None or appreciation == "": # Si il n'y a pas l'appréciation
-                #     score = None
-                # elif self.donnees.score_existe(annee_scolaire, trimestre, self.modele_ia.modele_choisi): # Si le score avec le modele choisi existe alors on prend le score
-                #     score = self.donnees.get_score_appreciation(annee_scolaire, trimestre, self.modele_ia.modele_choisi)
-                # else: # Sinon on fait le score et on le stocke dans le JSON
-                #     score = self.modele_ia.analyser([appreciation])[0]
-                #     self.donnees.set_score_appreciation(annee_scolaire, trimestre, self.modele_ia.modele_choisi, score)
-                # resultats["appréciations générales"].append(score)
-                resultats["appreciations_generales_text"].append(appreciation)
+                if resultats.get("appréciations générales") == None:
+                    resultats["appréciations générales"] = {"textes": [], "scores": []}
+                resultats["appréciations générales"]["textes"].append(appreciation)
 
                 self.chargement.progession += 1 * 80 / nb_total_donnees
+                
+                for matiere in matieres:
+                    # Obtenir les moyennes de la matière
+                    if resultats.get("moyennes " + matiere) == None:
+                        resultats["moyennes " + matiere] = []
+                    moyenne = self.donnees.get_moyenne(annee_scolaire, trimestre, matiere) if self.donnees.matiere_existe(annee_scolaire, trimestre, matiere) else None
+                    resultats["moyennes " + matiere].append(moyenne)
+
+                    # Obtenir les appréciations de la matière
+                    if resultats.get("appréciations " + matiere) == None:
+                        resultats["appréciations " + matiere] = {"textes": [], "scores": []}
+                    appreciation = self.donnees.get_appreciation(annee_scolaire, trimestre, matiere) if self.donnees.matiere_existe(annee_scolaire, trimestre, matiere) else None
+                    resultats["appréciations " + matiere]["textes"].append(appreciation)
 
                 print(self.chargement.progession)
 
         # Récupération des scores
-        vals_existes = [] # Les valeurs qui ne sont pas à None
-        ind_val_existe = [] # L'indice des valeurs qui ne sont pas à None
-        result = [None] * len(resultats["appreciations_generales_text"]) # Ce qui va être utilisé pour afficher le graphique
-        for i in range(len(resultats["appreciations_generales_text"])):
-            if resultats["appreciations_generales_text"][i] != None:
-                ind_val_existe.append(i)
-                vals_existes.append(resultats["appreciations_generales_text"][i])
-        scores = self.modele_ia.analyser(vals_existes)
+        for resultat in resultats.keys():
+            if resultat.startswith("appréciations "):
+                nom = resultat[len("appréciations "):]
 
-        # Mettre les données manquante dans la liste
-        j = 0
-        for i in range(len(result)):
-            if i in ind_val_existe:
-                result[i] = scores[j]
-                j += 1
-            
-        resultats["appréciations générales"] = result
-                
+                # On récupère les textes pour les analyser et les mettres dans scores
+                vals_existes = [] # Les valeurs qui ne sont pas à None
+                ind_val_existe = [] # L'indice des valeurs qui ne sont pas à None
+                result = [None] * len(resultats[resultat]["textes"]) # Ce qui va être utilisé pour afficher le graphique
+                for i in range(len(resultats[resultat]["textes"])):
+                    if resultats[resultat]["textes"][i] != None:
+                        ind_val_existe.append(i)
+                        vals_existes.append(resultats[resultat]["textes"][i])
+                scores = self.modele_ia.analyser(vals_existes)
+
+                # Mettre les données manquante dans la liste
+                j = 0
+                for i in range(len(result)):
+                    if i in ind_val_existe:
+                        result[i] = scores[j]
+                        j += 1
+
+                resultats["appréciations " + nom]["scores"] = result
+
         end_time = time.time()
-        
+
         print("TIME : ", end_time-start_time)
-        
+
+        # Récupération des données manquante qui vont être une autre ligne du graphique pour compléter les trous
         donnees_manquantes = dict()
         i = 0
         while i < len(trimestres):
-            for nom in resultats:
-                if not "text" in nom: # On ne veux pas des textes
-                    if (resultats[nom][i] == None):
-                        j = i
-                        while j < len(trimestres) and resultats[nom][j] == None:
-                            j += 1
-                        
-                        if (resultats[nom][j] != None):
-                            if (not donnees_manquantes.get(nom)):
-                                donnees_manquantes[nom] = {"trimestres": [], "valeurs": []}
-                            # Début des données manquantes
-                            if (i > 0): # Si on est pas au début
-                                donnees_manquantes[nom]["valeurs"].append(resultats[nom][i-1])
-                                donnees_manquantes[nom]["trimestres"].append(trimestres[i-1])
+            for resultat in resultats:
+                if resultat.startswith("appréciations "):
+                    valeur = resultats[resultat]["textes"][i]
+                else:
+                    valeur = resultats[resultat][i]
+                    
+                if (valeur == "données manquantes"):
+                    j = i
+
+                    if resultat.startswith("appréciations "):
+                        valeur_prochaine = resultats[resultat]["textes"][j]
+                    else:
+                        valeur_prochaine = resultats[resultat][j]
+
+                    while j < len(trimestres) and valeur_prochaine == "données manquantes":
+                        j += 1
+
+                    if (valeur_prochaine != "données manquantes"):
+                        if (not donnees_manquantes.get(resultat)):
+                            donnees_manquantes[resultat] = {"trimestres": [], "valeurs": []}
+                        # Début des données manquantes
+                        if (i > 0): # Si on est pas au début
+                            if resultat.startswith("appréciations "):
+                                valeur_prec = resultats[resultat]["textes"][i-1]
                             else:
-                                donnees_manquantes[nom]["valeurs"].append(resultats[nom][i])
-                                donnees_manquantes[nom]["trimestres"].append(trimestres[i])
-                            # Fin des données manquantes
-                            donnees_manquantes[nom]["valeurs"].append(resultats[nom][j])
-                            donnees_manquantes[nom]["trimestres"].append(trimestres[j])
-                            
+                                valeur_prec = resultats[resultat][i-1]
+                            donnees_manquantes[resultat]["valeurs"].append(valeur_prec)
+                            donnees_manquantes[resultat]["trimestres"].append(trimestres[i-1])
+                        else:
+                            donnees_manquantes[resultat]["valeurs"].append(valeur)
+                            donnees_manquantes[resultat]["trimestres"].append(trimestres[i])
+                        # Fin des données manquantes
+                        donnees_manquantes[resultat]["valeurs"].append(valeur_prochaine)
+                        donnees_manquantes[resultat]["trimestres"].append(trimestres[j])
+
             i += 1
 
         # Création du graphique
@@ -167,16 +192,16 @@ class Graphique:
                                             ))
 
                 case "appréciations générales":
-                    test = data.add_trace(go.Scatter(x=trimestres, y=valeurs,
-                                              customdata=resultats["appreciations_generales_text"],
+                    data.add_trace(go.Scatter(x=trimestres, y=valeurs["scores"],
+                                              customdata=resultats["appréciations générales"]["textes"],
                                               mode='lines+markers',
                                               name=nom,
                                               legendgroup=nom,
                                               legendgrouptitle={'text': nom},
                                               hovertemplate="%{customdata}<br>score : %{y}"
                                             ))
-
-                case "appreciations_generales_text":
+                
+                case _:
                     pass
 
         #Affichage ligne pour données manquantes     
@@ -289,6 +314,43 @@ class Donnees:
         if matiere:
             return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["appreciation"]
         return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["appreciation_generale"]
+
+    def get_matieres(self, annee_scolaire:str, trimestre:str) -> set[str]:
+        """Permet d'obtenir toute les matières à partir de l'année dcolaire et du trimestre selectionné
+
+        Args:
+            annee_scolaire (str): L'année scolaire choisi
+            trimestre (str): Le trimestre de l'année scolaire choisi
+
+        Returns:
+            set[str]: Les matières du trimestre choisi de l'année scolaire choisi
+        """
+        return set(self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"].keys())
+    
+    def get_all_matieres(self) -> set[str]:
+        """Permet d'obtenir toute les matières présente dans le fichier
+
+        Returns:
+            set[str]: Toute les matières présente
+        """
+        res = set()
+        for annee_scolaire in self.get_annees_scolaire():
+            for trimestre in self.get_trimestres(annee_scolaire):
+                res.update(self.get_matieres(annee_scolaire, trimestre))
+        return res
+
+    def matiere_existe(self, annee_scolaire:str, trimestre:str, matiere:str) -> bool:
+        """Permet de savoir si la matière existe au trimestre de l'année sélectionné
+
+        Args:
+            annee_scolaire (str): L'année scolaire choisi
+            trimestre (str): Le trimestre de l'année scolaire choisi
+            matiere (str): La matière
+
+        Returns:
+            bool: Return True si la matière existe dans le trimestre de l'année scolaire choisi sinon return False
+        """
+        return matiere in self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"].keys()
 
     def get_score_appreciation(self, annee_scolaire:str, trimestre:str, modele_ia:str, matiere:str = None) -> float:
         """Permet d'obtenir le score d'une appreciation à partir de l'année scolaire et du trimestre sélectionné. Si aucune matière n'est sélectionné, on choisi le score de l'appréciation générale sinon on choisi le score de l'appréciation de la matière choisi
