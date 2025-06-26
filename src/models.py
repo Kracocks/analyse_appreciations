@@ -144,8 +144,48 @@ class Graphique:
         # Création du graphique
         self.chargement.status = "Création du graphique"
 
+        COULEURS = PLOTLY_COLORS = [
+            "#1f77b4",
+            "#ff7f0e",
+            "#2ca02c",
+            "#d62728",
+            "#9467bd",
+            "#8c564b",
+            "#e377c2",
+            "#7f7f7f",
+            "#bcbd22",
+            "#17becf",
+            "#393b79",
+            "#637939",
+            "#8c6d31",
+            "#843c39",
+            "#7b4173",
+            "#5254a3",
+            "#9c9ede",
+            "#cedb9c",
+            "#bd9e39",
+            "#e7969c",
+            "#de9ed6",
+            "#6b6ecf",
+            "#b5cf6b",
+            "#ad494a",
+            "#a55194",
+            "#393b79",
+            "#8ca252",
+            "#bd9e39",
+            "#d6616b",
+            "#e7ba52",
+            "#ce6dbd",
+            "#6b486b",
+            "#a05d56",
+            "#d0743c",
+            "#ff8c00",
+        ]
+        ind_couleur = 0
         data = go.Figure(layout_yaxis_range=[0,20])
         for nom, valeurs in resultats.items():
+            couleur = COULEURS[ind_couleur % len(COULEURS)]
+            ind_couleur += 1
             match nom:
                 case "moyennes générales":
                     data.add_trace(go.Scatter(x=trimestres, y=valeurs,
@@ -155,7 +195,7 @@ class Graphique:
                                               legendgrouptitle={'text': nom},
                                               showlegend=False,
                                               hoverinfo="skip",
-                                              line=dict(dash= "longdash"),
+                                              line=dict(dash= "longdash", color=couleur),
                                               connectgaps=True
                                             ))
                     data.add_trace(go.Scatter(x=trimestres, y=valeurs,
@@ -163,7 +203,8 @@ class Graphique:
                                               name=nom,
                                               legendgroup=nom,
                                               legendgrouptitle={'text': nom},
-                                              hovertemplate="%{y}"
+                                              hovertemplate="%{y}",
+                                              line=dict(color=couleur)
                                             ))
 
                 case "appréciations générales":
@@ -174,7 +215,7 @@ class Graphique:
                                               legendgrouptitle={'text': nom},
                                               showlegend=False,
                                               hoverinfo="skip",
-                                              line=dict(dash= "longdash"),
+                                              line=dict(dash= "longdash", color=couleur),
                                               connectgaps=True
                                             ))
                     data.add_trace(go.Scatter(x=trimestres, y=valeurs["scores"],
@@ -183,7 +224,8 @@ class Graphique:
                                               name=nom,
                                               legendgroup=nom,
                                               legendgrouptitle={'text': nom},
-                                              hovertemplate="%{customdata}<br>score : %{y}"
+                                              hovertemplate="%{customdata}<br>score : %{y}",
+                                              line=dict(color=couleur)
                                             ))
                 
                 case _:
@@ -196,7 +238,7 @@ class Graphique:
                                                   showlegend=False,
                                                   hoverinfo="skip",
                                                   visible="legendonly",
-                                                  line=dict(dash= "longdash"),
+                                                  line=dict(dash= "longdash", color=couleur),
                                                   connectgaps=True
                                                 ))
                         data.add_trace(go.Scatter(x=trimestres, y=valeurs,
@@ -205,7 +247,8 @@ class Graphique:
                                                   legendgroup=nom,
                                                   legendgrouptitle={'text': nom},
                                                   visible="legendonly",
-                                                  hovertemplate="%{y}"
+                                                  hovertemplate="%{y}",
+                                                  line=dict(color=couleur)
                                                 ))
 
                     elif nom.startswith("appréciations "):
@@ -217,7 +260,7 @@ class Graphique:
                                                   showlegend=False,
                                                   hoverinfo="skip",
                                                   visible="legendonly",
-                                                  line=dict(dash= "longdash"),
+                                                  line=dict(dash= "longdash", color=couleur),
                                                   connectgaps=True
                                                 ))
                         data.add_trace(go.Scatter(x=trimestres, y=valeurs["scores"],
@@ -227,7 +270,8 @@ class Graphique:
                                                   legendgroup=nom,
                                                   legendgrouptitle={'text': nom},
                                                   visible="legendonly",
-                                                  hovertemplate="%{customdata}<br>score : %{y}"
+                                                  hovertemplate="%{customdata}<br>score : %{y}",
+                                                  line=dict(color=couleur)
                                                 ))
 
         graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
