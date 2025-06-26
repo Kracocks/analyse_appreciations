@@ -144,7 +144,7 @@ class Graphique:
         # Création du graphique
         self.chargement.status = "Création du graphique"
 
-        COULEURS = PLOTLY_COLORS = [
+        COULEURS = [
             "#1f77b4",
             "#ff7f0e",
             "#2ca02c",
