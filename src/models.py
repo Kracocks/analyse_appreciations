@@ -94,16 +94,22 @@ class Graphique:
                 
                 for matiere in matieres:
                     # Obtenir les moyennes de la matière
+                    self.chargement.status = "Récupération de la moyenne de " + matiere + " du " + trimestre + " de l'année scolaire " + annee_scolaire
                     if resultats.get("moyennes " + matiere) == None:
                         resultats["moyennes " + matiere] = []
                     moyenne = self.donnees.get_moyenne(annee_scolaire, trimestre, matiere) if self.donnees.matiere_existe(annee_scolaire, trimestre, matiere) else None
                     resultats["moyennes " + matiere].append(moyenne)
+                    
+                    self.chargement.progession += 1 * 80 / nb_total_donnees
 
                     # Obtenir les appréciations de la matière
+                    self.chargement.status = "Récupération de l'appréciation de " + matiere + " du " + trimestre + " de l'année scolaire " + annee_scolaire
                     if resultats.get("appréciations " + matiere) == None:
                         resultats["appréciations " + matiere] = {"textes": [], "scores": []}
                     appreciation = self.donnees.get_appreciation(annee_scolaire, trimestre, matiere) if self.donnees.matiere_existe(annee_scolaire, trimestre, matiere) else None
                     resultats["appréciations " + matiere]["textes"].append(appreciation)
+                    
+                    self.chargement.progession += 1 * 80 / nb_total_donnees
 
                 print(self.chargement.progession)
 
