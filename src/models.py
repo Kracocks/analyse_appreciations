@@ -153,6 +153,7 @@ class Graphique:
                                               name=nom + " (donnée(s) manquante(s))",
                                               legendgroup=nom,
                                               legendgrouptitle={'text': nom},
+                                              showlegend=False,
                                               hoverinfo="skip",
                                               line=dict(dash= "longdash"),
                                               connectgaps=True
@@ -171,6 +172,7 @@ class Graphique:
                                               name=nom + " (donnée(s) manquante(s))",
                                               legendgroup=nom,
                                               legendgrouptitle={'text': nom},
+                                              showlegend=False,
                                               hoverinfo="skip",
                                               line=dict(dash= "longdash"),
                                               connectgaps=True
@@ -191,6 +193,7 @@ class Graphique:
                                                   name=nom + " (donnée(s) manquante(s))",
                                                   legendgroup=nom,
                                                   legendgrouptitle={'text': nom},
+                                                  showlegend=False,
                                                   hoverinfo="skip",
                                                   visible="legendonly",
                                                   line=dict(dash= "longdash"),
@@ -211,6 +214,7 @@ class Graphique:
                                                   name=nom + " (donnée(s) manquante(s))",
                                                   legendgroup=nom,
                                                   legendgrouptitle={'text': nom},
+                                                  showlegend=False,
                                                   hoverinfo="skip",
                                                   visible="legendonly",
                                                   line=dict(dash= "longdash"),
