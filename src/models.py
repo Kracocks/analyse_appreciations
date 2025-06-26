@@ -135,60 +135,6 @@ class Graphique:
 
         print("TIME : ", end_time-start_time)
 
-        # Récupération des données manquante qui vont être une autre ligne du graphique pour compléter les trous
-        # donnees_manquantes = dict()
-        # i = 0
-        # while i < len(trimestres):
-        #     for resultat in resultats:
-        #         est_appreciation = resultat.startswith("appréciations ")
-        #         if est_appreciation:
-        #             valeur = resultats[resultat]["textes"][i]
-        #         else:
-        #             valeur = resultats[resultat][i]
-                    
-        #         if (valeur == "données manquantes"):
-        #             j = i
-                    
-        #             if est_appreciation:
-        #                 valeur_prochaine = resultats[resultat]["textes"][j]
-        #             else:
-        #                 valeur_prochaine = resultats[resultat][j]
-
-        #             while j < len(trimestres)-1 and valeur_prochaine == "données manquantes":
-        #                 if est_appreciation:
-        #                     resultats[resultat]["textes"][j] = None
-        #                     resultats[resultat]["scores"][j] = None
-        #                     valeur_prochaine = resultats[resultat]["textes"][j + 1]
-        #                 else:
-        #                     resultats[resultat][j] = None
-        #                     valeur_prochaine = resultats[resultat][j + 1]
-        #                 j += 1
-
-        #             if (valeur_prochaine != "données manquantes"):
-        #                 if (not donnees_manquantes.get(resultat)):
-        #                     donnees_manquantes[resultat] = {"trimestres": [], "valeurs": []}
-        #                 # Début des données manquantes
-        #                 if (i > 0): # Si on est pas au début
-        #                     if est_appreciation:
-        #                         valeur_prec = resultats[resultat]["scores"][i-1]
-        #                     else:
-        #                         valeur_prec = resultats[resultat][i-1]
-        #                     donnees_manquantes[resultat]["valeurs"].append(valeur_prec)
-        #                     donnees_manquantes[resultat]["trimestres"].append(trimestres[i-1])
-        #                 else:
-        #                     if est_appreciation:
-        #                         valeur = resultats[resultat]["scores"][i]
-        #                     donnees_manquantes[resultat]["valeurs"].append(valeur)
-        #                     donnees_manquantes[resultat]["trimestres"].append(trimestres[i])
-        #                 # Fin des données manquantes
-        #                 if est_appreciation:
-        #                         valeur_prochaine = resultats[resultat]["scores"][j]
-        #                 donnees_manquantes[resultat]["valeurs"].append(valeur_prochaine)
-        #                 donnees_manquantes[resultat]["trimestres"].append(trimestres[j])
-
-        #     i += 1
-
-        print(resultats)
         # Création du graphique
         self.chargement.status = "Création du graphique"
 
@@ -273,30 +219,6 @@ class Graphique:
                                                   visible="legendonly",
                                                   hovertemplate="%{customdata}<br>score : %{y}"
                                                 ))
-
-        #Affichage ligne pour données manquantes     
-        # for nom, valeurs in donnees_manquantes.items():
-        #     if nom == "appréciations générales" or nom == "moyennes générales":
-        #         data.add_trace(go.Scatter(
-        #             x=valeurs["trimestres"], y=valeurs["valeurs"],
-        #             mode="lines",
-        #             name=nom + " (donnée(s) manquante(s))",
-        #             legendgroup=nom,
-        #             legendgrouptitle={'text': nom},
-        #             hoverinfo="skip",
-        #             line=dict(dash= "longdash")
-        #         ))
-        #     else:
-        #         data.add_trace(go.Scatter(
-        #             x=valeurs["trimestres"], y=valeurs["valeurs"],
-        #             mode="lines",
-        #             name=nom + " (donnée(s) manquante(s))",
-        #             legendgroup=nom,
-        #             legendgrouptitle={'text': nom},
-        #             visible="legendonly",
-        #             hoverinfo="skip",
-        #             line=dict(dash= "longdash")
-        #         ))
 
         graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
