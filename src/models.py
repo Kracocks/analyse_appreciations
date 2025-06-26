@@ -57,8 +57,7 @@ class Graphique:
             str: Le graphique généré
         """   
         # Récupération des données
-        self.chargement.progession = 0
-        self.chargement.est_fini = False
+        self.chargement.to_start()
         self.chargement.status = "Récupération des données"
 
         start_time = time.time()
@@ -81,7 +80,7 @@ class Graphique:
                 mg = self.donnees.get_moyenne(annee_scolaire, trimestre)
                 resultats["moyennes générales"].append(mg)
 
-                self.chargement.progession += 1 * 80 / nb_total_donnees
+                self.chargement.update_progression(1 * 80 / nb_total_donnees)
 
                 # Obtenir les appréciations générales
                 self.chargement.status = "Récupération de l'appréciation générale du " + trimestre + " de l'année scolaire " + annee_scolaire
@@ -90,7 +89,7 @@ class Graphique:
                     resultats["appréciations générales"] = {"textes": [], "scores": []}
                 resultats["appréciations générales"]["textes"].append(appreciation)
 
-                self.chargement.progession += 1 * 80 / nb_total_donnees
+                self.chargement.update_progression(1 * 80 / nb_total_donnees)
                 
                 for matiere in matieres:
                     # Obtenir les moyennes de la matière
@@ -100,7 +99,7 @@ class Graphique:
                     moyenne = self.donnees.get_moyenne(annee_scolaire, trimestre, matiere) if self.donnees.matiere_existe(annee_scolaire, trimestre, matiere) else None
                     resultats["moyennes " + matiere].append(moyenne)
                     
-                    self.chargement.progession += 1 * 80 / nb_total_donnees
+                    self.chargement.update_progression(1 * 80 / nb_total_donnees)
 
                     # Obtenir les appréciations de la matière
                     self.chargement.status = "Récupération de l'appréciation de " + matiere + " du " + trimestre + " de l'année scolaire " + annee_scolaire
@@ -109,9 +108,9 @@ class Graphique:
                     appreciation = self.donnees.get_appreciation(annee_scolaire, trimestre, matiere) if self.donnees.matiere_existe(annee_scolaire, trimestre, matiere) else None
                     resultats["appréciations " + matiere]["textes"].append(appreciation)
                     
-                    self.chargement.progession += 1 * 80 / nb_total_donnees
+                    self.chargement.update_progression(1 * 80 / nb_total_donnees)
 
-                print(self.chargement.progession)
+                print(self.chargement.progression)
 
         # Récupération des scores
         for resultat in resultats.keys():
@@ -276,8 +275,7 @@ class Graphique:
 
         graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
-        self.chargement.progession = 100
-        self.chargement.est_fini = True
+        self.chargement.to_end()
 
         return graphJSON
 
@@ -548,6 +546,21 @@ class ModeleIA:
 
 class Chargement:
     def __init__(self):
-        self.progession = 0
+        self.temp_prog = 0
+        self.progression = 0
         self.est_fini = False
         self.status = ""
+    
+    def to_start(self):
+        self.temp_prog = 0
+        self.progression = 0
+        self.est_fini = False
+        
+    def to_end(self):
+        self.temp_prog = 100
+        self.progression = 100
+        self.est_fini = True
+        
+    def update_progression(self, added_progression):
+        self.temp_prog += added_progression
+        self.progression = round(self.temp_prog)

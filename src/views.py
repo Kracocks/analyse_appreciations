@@ -47,7 +47,7 @@ def index():
 @app.route('/progress') # Mettre a jour la bar de progression
 def progress():
     def generate():
-        progression = graphique.chargement.progession
+        progression = graphique.chargement.progression
         statut = graphique.chargement.status
         data = json.dumps({"progression": progression, "statut":statut})
         yield "data:" + str(data) + "\n\n"
