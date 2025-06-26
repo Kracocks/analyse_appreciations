@@ -121,7 +121,7 @@
 
                 graphique.on('plotly_click', function(data){
                     for(var i=0; i < data.points.length; i++){
-                        if (data.points[i].fullData.name == "appréciations générales") {
+                        if (data.points[i].fullData.name.startsWith("appréciations ")) {
                             selected_text = "Texte sélectionné : " +data.points[i].customdata
                         }
                     }
