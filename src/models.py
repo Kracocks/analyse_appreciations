@@ -182,6 +182,16 @@ class Graphique:
         ]
         ind_couleur = 0
         data = go.Figure(layout_yaxis_range=[0,20])
+        data.update_layout(
+            legend=dict(
+                orientation="h",
+                yanchor="top",
+                y=-0.3,
+                xanchor="center",
+                x=0.5,
+                traceorder="normal"
+            )
+        )
         for nom, valeurs in resultats.items():
             couleur = COULEURS[ind_couleur % len(COULEURS)]
             ind_couleur += 1
@@ -508,7 +518,7 @@ class ModeleIA:
         for score in scores:
             for score in score:
                 if score["label"].upper() == "POSITIVE":
-                    res.append(round(score["score"] * 20))
+                    res.append(round(score["score"] * 20, 2))
         return res
 
     def noter(self) -> float:
