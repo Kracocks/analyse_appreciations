@@ -223,7 +223,7 @@ class Graphique:
                                               name=nom,
                                               legendgroup=nom,
                                               legendgrouptitle={'text': nom},
-                                              hovertemplate="%{customdata}<br>score : %{y}",
+                                              hovertemplate="%{customdata}<br>note IA : %{y}",
                                               line=dict(color=couleur)
                                             ))
                 
@@ -269,7 +269,7 @@ class Graphique:
                                                   legendgroup=nom,
                                                   legendgrouptitle={'text': nom},
                                                   visible="legendonly",
-                                                  hovertemplate="%{customdata}<br>score : %{y}",
+                                                  hovertemplate="%{customdata}<br>note IA : %{y}",
                                                   line=dict(color=couleur)
                                                 ))
 
@@ -508,7 +508,7 @@ class ModeleIA:
         for score in scores:
             for score in score:
                 if score["label"].upper() == "POSITIVE":
-                    res.append((score["score"] * 20))
+                    res.append(round(score["score"] * 20))
         return res
 
     def noter(self) -> float:
@@ -537,7 +537,7 @@ class ModeleIA:
                 total = comportements[i] + participations[i] + travails[i] # Le total vaut au maximum 30
                 # Mettre le résultat sur 20
                 note = total * 20 / 30
-                notes.append(note)
+                notes.append(round(note, 2))
 
             x = pd.Series(scores)
             y = pd.Series(notes)
