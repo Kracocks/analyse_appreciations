@@ -287,22 +287,29 @@ class Graphique:
                 for i in range(len(trimestres)):
                             data.add_annotation(
                                 x=trimestres[i], y=valeurs["scores"][i],
+                                xref="x",
+                                yref="y",
                                 text=f"{self.wrap(resultats[nom]["textes"][i])}",
                                 clicktoshow="onoff",
                                 visible=False,
+                                font=dict(
+                                    family="Courier New, monospace",
+                                    size=11,
+                                    color="#ffffff"
+                                    ),
+                                align="center",
+                                arrowhead=4,
+                                arrowsize=1,
+                                arrowwidth=2,
+                                arrowcolor="#636363",
                                 ax=0,
-                                ay=-75,
+                                ay=-30,
+                                bordercolor="#c7c7c7",
+                                borderwidth=2,
+                                borderpad=4,
+                                bgcolor=couleur,
+                                opacity=0.8
                             )
-                        
-        # var annotation = {
-        #         x: point.x,
-        #         y: point.y,
-        #         text: point.customdata ? point.customdata + "<br>note IA : " + point.y : point.y,
-        #         showarrow: true,
-        #         arrowhead: 7,
-        #         ax: 0,
-        #         ay: -40
-        #         };
 
         graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
