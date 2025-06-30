@@ -7,6 +7,7 @@ from transformers import pipeline
 from datasets import load_dataset
 from math import sqrt
 import time
+import textwrap
 
 class Graphique:
     def __init__(self):
@@ -236,7 +237,7 @@ class Graphique:
                                               hovertemplate="%{customdata}<br>note IA : %{y}",
                                               line=dict(color=couleur)
                                             ))
-                
+
                 case _:
                     if nom.startswith("moyennes "):
                         data.add_trace(go.Scatter(x=trimestres, y=valeurs,
@@ -282,12 +283,41 @@ class Graphique:
                                                   hovertemplate="%{customdata}<br>note IA : %{y}",
                                                   line=dict(color=couleur)
                                                 ))
+            if nom.startswith("appréciations "):
+                for i in range(len(trimestres)):
+                            data.add_annotation(
+                                x=trimestres[i], y=valeurs["scores"][i],
+                                text=f"{self.wrap(resultats[nom]["textes"][i])}",
+                                clicktoshow="onoff",
+                                visible=False,
+                                ax=0,
+                                ay=-75,
+                            )
+                        
+        # var annotation = {
+        #         x: point.x,
+        #         y: point.y,
+        #         text: point.customdata ? point.customdata + "<br>note IA : " + point.y : point.y,
+        #         showarrow: true,
+        #         arrowhead: 7,
+        #         ax: 0,
+        #         ay: -40
+        #         };
 
         graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
         self.chargement.to_end()
 
         return graphJSON
+
+    def wrap(self, text):
+        if (text == None):
+            return None
+        wrap = textwrap.wrap(text, width=40)
+        texte = ""
+        for text_part in wrap:
+            texte += text_part + "<br>"
+        return texte
 
 class Donnees:
     def __init__(self, fichier:str):
@@ -492,7 +522,8 @@ class ModeleIA:
         self.modele_choisi = modele_choisi
         self.modeles_disponibles = {"Peed911/french_sentiment_analysis": pipeline("text-classification", model="Peed911/french_sentiment_analysis", top_k=None),
                                     "ac0hik/Sentiment_Analysis_French" : pipeline("text-classification", model="ac0hik/Sentiment_Analysis_French", top_k=None)}
-        self.notes = self.noter()
+        #self.notes = self.noter()
+        self.notes = 0.0
 
     def modifier_modele(self, new_nom_modele:str):
         """Modifier le modèle d'IA utilisé par l'application

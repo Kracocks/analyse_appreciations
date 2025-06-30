@@ -113,22 +113,11 @@
                     graphique_div.style.display = "block";
                     progress_div.style.display = "none";
                 }
-                Plotly.plot('bargraph', graphs, {});
+                Plotly.plot('bargraph', graphs, {}, {editable: true});
 
                 // Evenement quand on clique sur un point
                 var graphique = document.getElementById('bargraph');
                 var selected_text = '';
-
-                graphique.on('plotly_click', function(data){
-                    for(var i=0; i < data.points.length; i++){
-                        if (data.points[i].fullData.name.startsWith("appréciations ")) {
-                            selected_text = "Texte sélectionné : " +data.points[i].customdata
-                        }
-                    }
-
-                    var paragraph = document.getElementById("selected_text");
-                    paragraph.textContent = selected_text
-                });
             });
         </script>
         {% endif %}
