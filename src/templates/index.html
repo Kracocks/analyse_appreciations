@@ -50,6 +50,15 @@
         <script src="{{url_for('static', filename='on_file_selected.js')}}"></script>
     </div>
 
+    <div id="model-input">
+        <form method="post" id="add_model_form">
+            <input type="text" name="name" id="name">
+        </form>
+        <form method="post" id="generate_note">
+            <input type="submit" value="Générer les corrélations des modèles"></input>
+        </form>
+    </div>
+
     <!-- Tout les éléments qui seront affiché lorsqu'un fichier à été sélectionné comme le choix du modèle, le graphique et la bar de chargement -->
     <div id="graphique-zone">
         <!-- Selection de paramètres pour le graphique -->

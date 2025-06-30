@@ -1,10 +1,14 @@
 from flask import Flask
 from flask_dropzone import Dropzone
+from flask_sqlalchemy import SQLAlchemy
 import os.path
 
 MAXIMUM_FILE_SIZE = 15 # En MB
 
 app = Flask(__name__)
+
+def mkpath(p):
+    return os.path.normpath(os.path.join(os.path.dirname(__file__), p))
 
 app.config.update(
     DROPZONE_REDIRECT_VIEW = 'index',
@@ -19,9 +23,10 @@ app.config.update(
     DROPZONE_MAX_FILE_EXCEED = 'Vous ne pouvez pas importer plus de fichier',
     
     UPLOAD_PATH = "uploads",
+    
+    SQLALCHEMY_DATABASE_URI = ('sqlite:///'+mkpath('../app.db'))
 )
 
-dropzone = Dropzone(app)
+db = SQLAlchemy(app)
 
-def mkpath(p):
-    return os.path.normpath(os.path.join(os.path.dirname(__file__), p))
+dropzone = Dropzone(app)

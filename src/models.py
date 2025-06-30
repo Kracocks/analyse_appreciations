@@ -1,3 +1,4 @@
+from .app import db
 import json
 import plotly
 import plotly.graph_objs as go
@@ -612,3 +613,17 @@ class Chargement:
     def update_progression(self, added_progression):
         self.temp_prog += added_progression
         self.progression = round(self.temp_prog)
+
+class ModeleDB(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nom = db.Column(db.String)
+    correlation = db.Column(db.Float)
+    
+    def __repr__(self):
+        return f"<Modele {self.id, self.nom, self.correlation}>"
+
+def get_modeles():
+    return ModeleDB.query.all()
+
+def get_modele(id_modele):
+    return ModeleDB.query.get_or_404(id_modele)
