@@ -50,12 +50,30 @@
         <script src="{{url_for('static', filename='on_file_selected.js')}}"></script>
     </div>
 
+    <!-- Ajout de modèles et calcul de leur corrélation -->
     <div id="model-input">
-        <form method="post" id="add_model_form">
-            <input type="text" name="name" id="name">
+        <form role="form" method="post" action="{{ url_for('save_modele') }}">
+            {{ form.hidden_tag() }}
+            <div class={% if form.nom.errors %}
+                        "form-group has-error"
+                        {% else %}
+                        "form-group"
+                        {% endif %}>
+                {{ form.nom.label }} {{ form.nom(size=50, class_="form-control") }}
+            </div>
+            {% if form.nom.errors%}
+            <ul class="list-group">
+                {% for e in form.nom.errors%}
+                <li class="list-group-item list-group-item-danger">{{e}}</li>
+                {% endfor%}
+            </ul>
+            {% endif%}
+            <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Ajouter">
         </form>
-        <form method="post" id="generate_note">
-            <input type="submit" value="Générer les corrélations des modèles"></input>
+        <h1 class="calcul-correlation">Coefficient de corrélation</h1>
+        <form role="form" method="POST" action="{{ url_for('correler_modele') }}">
+            {{ form.hidden_tag() }}
+            <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Calculer les corrélations">
         </form>
     </div>
 

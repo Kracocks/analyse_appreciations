@@ -1,6 +1,6 @@
-from .app import app
-from .models import Graphique
-from flask import render_template, Response
+from .app import app, db
+from .models import Graphique, ModeleForm, ModeleDB, get_last_modele_id
+from flask import render_template,redirect, url_for, Response
 import os
 from flask import request
 from werkzeug.utils import secure_filename
@@ -36,13 +36,16 @@ def index():
         if request.form.get("modeles_choice"):
             modele_selectionne = request.form.get("modeles_choice")
             graphique.modifier_modele(modele_selectionne)
+        
+    f=ModeleForm()
 
     return render_template("index.html",
                            fichier_charge=filename,
                            modeles_disponibles=modeles_disponibles,
                            fichiers_recents=fichiers_recents,
                            modele_selectionne=modele_selectionne,
-                           notes_ia=graphique.modele_ia.notes)
+                           notes_ia=graphique.modele_ia.notes,
+                           form=f)
 
 @app.route('/progress') # Mettre a jour la bar de progression
 def progress():
@@ -60,3 +63,18 @@ def get_graph():
     if (graphique.donnees.fichier != ""):
         graph = graphique.generer()
     return json.dumps({"graph": graph})
+
+@app.route("/add/modele/", methods=["POST"])
+def save_modele():
+    modele = None
+    f = ModeleForm()
+    if f.validate_on_submit():
+        id = get_last_modele_id() + 1
+        modele = ModeleDB(id=id, nom=f.nom.data, correlation=None)
+        db.session.add(modele)
+        db.session.commit()
+    return redirect(url_for("index"))
+
+@app.route("/edit/correlation", methods=["POST"])
+def correler_modele():
+    return

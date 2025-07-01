@@ -24,7 +24,9 @@ app.config.update(
     
     UPLOAD_PATH = "uploads",
     
-    SQLALCHEMY_DATABASE_URI = ('sqlite:///'+mkpath('../app.db'))
+    SQLALCHEMY_DATABASE_URI = ('sqlite:///'+mkpath('../app.db')),
+    
+    SECRET_KEY = "s;8yY2.5ge}PH0:"
 )
 
 db = SQLAlchemy(app)

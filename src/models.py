@@ -9,6 +9,9 @@ from datasets import load_dataset
 from math import sqrt
 import time
 import textwrap
+from flask_wtf import FlaskForm
+from wtforms import HiddenField, StringField
+from wtforms.validators import DataRequired
 
 class Graphique:
     def __init__(self):
@@ -615,9 +618,14 @@ class Chargement:
         self.progression = round(self.temp_prog)
 
 class ModeleDB(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nom = db.Column(db.String)
+    __tablename__ = "modele"
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    nom = db.Column(db.String, nullable=False)
     correlation = db.Column(db.Float)
+    
+class ModeleForm(FlaskForm):
+    id = HiddenField("id")
+    nom = StringField("Nom", validators=[DataRequired()])
     
     def __repr__(self):
         return f"<Modele {self.id, self.nom, self.correlation}>"
@@ -627,3 +635,8 @@ def get_modeles():
 
 def get_modele(id_modele):
     return ModeleDB.query.get_or_404(id_modele)
+
+def get_last_modele_id():
+    last_model = ModeleDB.query.order_by(ModeleDB.id.desc()).first()
+    if last_model:
+        return last_model.id

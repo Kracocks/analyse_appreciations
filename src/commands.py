@@ -1,10 +1,8 @@
-import click
 from .app import app, db
 from.models import ModeleDB
 
 @app.cli.command()
-@click.argument("filename")
-def loaddb(filename):
+def loaddb():
     '''Créer les tables et les populer avec des données'''
 
     db.create_all()
