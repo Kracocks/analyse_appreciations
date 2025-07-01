@@ -1,4 +1,4 @@
-from .app import db
+from .app import db, app
 import json
 import plotly
 import plotly.graph_objs as go
@@ -6,12 +6,13 @@ import numpy as np
 import pandas as pd
 from transformers import pipeline
 from datasets import load_dataset
-from math import sqrt
 import time
 import textwrap
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, StringField
 from wtforms.validators import DataRequired
+
+modeles_disponibles = []
 
 class Graphique:
     def __init__(self):
@@ -20,24 +21,9 @@ class Graphique:
         self.nom = ""
         self.variables = ["moyennes générales", "appréciations générales"]
         self.donnees = Donnees("")
-        self.modele_ia = ModeleIA("")
+        self.modeles_disponibles = []
+        self.modele_choisi = ModeleDB()
         self.chargement = Chargement()
-
-    def ajouter_variable(self, var:str):
-        """Ajouter une varible parmis les variables qui seront affiché dans le graphique
-
-        Args:
-            var (str): La variable à ajouter
-        """
-        self.variables.append(var)
-
-    def supprimer_variable(self, var:str):
-        """Supprimer une varibles parmis les variables qui seront affiché sur le graphique
-
-        Args:
-            var (str): La variable à supprimer
-        """
-        self.variables.remove(var)
 
     def modifier_donnees(self, fichier:str):
         """Modifier le fichier utilisé pour afficher les données dans un graphique. Le fichier doit être un fichier JSON qui doit respecter une architecture.
@@ -53,7 +39,7 @@ class Graphique:
         Args:
             modele (str): Le nouveau modèle d'IA
         """
-        self.modele_ia.modifier_modele(modele)
+        self.modele_choisi = get_modele_from_nom(modele)
 
     def generer(self) -> str:
         """Génère un graphique à partir des données, variables et modèle d'IA
@@ -130,7 +116,7 @@ class Graphique:
                     if resultats[resultat]["textes"][i] != None:
                         ind_val_existe.append(i)
                         vals_existes.append(resultats[resultat]["textes"][i])
-                scores = self.modele_ia.analyser(vals_existes)
+                scores = self.modele_choisi.analyser(vals_existes)
 
                 # Mettre les données manquante dans la liste
                 j = 0
@@ -523,79 +509,6 @@ class Donnees:
         
         return total
 
-class ModeleIA:
-    def __init__(self, modele_choisi:str):
-        """Le constructeur de la classe ModeleIA
-
-        Args:
-            modele_choisi (str): Le modele d'IA
-        """
-        self.modele_choisi = modele_choisi
-        self.modeles_disponibles = {"Peed911/french_sentiment_analysis": pipeline("text-classification", model="Peed911/french_sentiment_analysis", top_k=None),
-                                    "ac0hik/Sentiment_Analysis_French" : pipeline("text-classification", model="ac0hik/Sentiment_Analysis_French", top_k=None)}
-        #self.notes = self.noter()
-        self.notes = 0.0
-
-    def modifier_modele(self, new_nom_modele:str):
-        """Modifier le modèle d'IA utilisé par l'application
-
-        Args:
-            new_nom_modele (str): Le nouveau modèle d'IA utilisé
-        """
-        self.modele_choisi = new_nom_modele
-    
-    def analyser(self, textes:list[str], modele:str = None) -> list[float]:
-        """Analyse et donne un score /20 à un texte à partir du modele d'IA sélectionné
-
-        Args:
-            textes (list[str]): Les textes à analyser
-            modele (str, optional): Le modèle à utiliser. Si aucun, prendre modele_choisi dans la classe. None par défault.
-
-        Returns:
-            list[float]: Les scores /20 attribué aux textes
-        """
-        res = []
-        pipe = self.modeles_disponibles[modele if modele != None else self.modele_choisi]
-        scores = pipe(textes)
-        for score in scores:
-            for score in score:
-                if score["label"].upper() == "POSITIVE":
-                    res.append(round(score["score"] * 20, 2))
-        return res
-
-    def noter(self) -> float:
-        """Permet de noter automatiquement un modèle d'IA. Pour cela on va prendre le dataset eltorio/appreciation sur HuggingFace 
-        qui est utilisé pour lister des appréciations et leur donner un score sur 10 sur 3 catégories : le comportement, la participation et 
-        le travail. Ensuite on va donner ces appréciations aux modèles d'IA qui vont nous donner une liste de scores sur 20 puis on va mettres 
-        les 3 notes en une notes sur 20. Pour finir on va calculer le coefficient de correlation en les scores que nous ont donné les IA.
-
-        Returns:
-            float: Le taux de précision.
-        """
-        dstrain = load_dataset("eltorio/appreciation", split="train")
-        dsvalid = load_dataset("eltorio/appreciation", split="validation")
-        
-        commentaires = dstrain["commentaire"] + dsvalid["commentaire"]
-        comportements = dstrain["comportement 0-10"] + dsvalid["comportement 0-10"]
-        participations = dstrain["participation 0-10"] + dsvalid["participation 0-10"]
-        travails = dstrain["travail 0-10"] + dsvalid["travail 0-10"]
-
-        resultats = dict()
-        for modele in self.modeles_disponibles.keys():
-            scores = self.analyser(commentaires, modele)
-
-            notes = []
-            for i in range(len(comportements)):
-                total = comportements[i] + participations[i] + travails[i] # Le total vaut au maximum 30
-                # Mettre le résultat sur 20
-                note = total * 20 / 30
-                notes.append(round(note, 2))
-
-            x = pd.Series(scores)
-            y = pd.Series(notes)
-            resultats[modele] = format(float(x.corr(y)), '5g')
-        return resultats
-
 class Chargement:
     def __init__(self):
         self.temp_prog = 0
@@ -622,16 +535,40 @@ class ModeleDB(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     nom = db.Column(db.String, nullable=False)
     correlation = db.Column(db.Float)
+    pipeline = None
+    
+    def __repr__(self):
+        return f"<Modele {self.id, self.nom, self.correlation}>"
+    
+    def analyser(self, textes:list[str]) ->list[float]:
+        """Analyse et donne un score /20 à un texte à partir du modele d'IA sélectionné
+
+        Args:
+            textes (list[str]): Les textes à analyser
+            modele (str, optional): Le modèle à utiliser. Si aucun, prendre modele_choisi dans la classe. None par défault.
+
+        Returns:
+            list[float]: Les scores /20 attribué aux textes
+        """
+        res = []
+        if self.pipeline == None:
+            self.pipeline = pipeline("text-classification", model=self.nom, top_k=None) 
+        scores = self.pipeline(textes)
+        for score in scores:
+            for score in score:
+                if score["label"].upper() == "POSITIVE":
+                    res.append(round(score["score"] * 20, 2))
+        return res
     
 class ModeleForm(FlaskForm):
     id = HiddenField("id")
     nom = StringField("Nom", validators=[DataRequired()])
-    
-    def __repr__(self):
-        return f"<Modele {self.id, self.nom, self.correlation}>"
 
 def get_modeles():
     return ModeleDB.query.all()
+
+def get_modele_from_nom(nom:str):
+    return ModeleDB.query.filter_by(nom=nom).first()
 
 def get_modele(id_modele):
     return ModeleDB.query.get_or_404(id_modele)
