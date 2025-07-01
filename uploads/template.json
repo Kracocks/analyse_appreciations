@@ -1,0 +1,411 @@
+{
+    "nom": "Romain",
+    "prenom": "Voivenel",
+    "date_de_naissance": "23-04-2005",
+    "sexe": "M",
+    "INE": "070155394FA",
+    "annees_scolaire": {
+        "2021-2022": {
+            "trimestres": {
+                "T1": {
+                    "etablissement": {
+                        "nom": "Lyc\u00e9e Blaise Pascal",
+                        "adresse": "27 BD BLAISE PASCAL"
+                    },
+                    "matiere": {
+                        "FRANCAIS": {
+                            "moyenne": 13.01,
+                            "appreciation": "L'ensemble est correct. Romain fournit un travail s\u00e9rieux. Poursuivez vos efforts."
+                        },
+                        "HISTOIRE & GEOGRAPH.": {
+                            "moyenne": 12.12,
+                            "appreciation": "Ensemble convenable. Romain travaille r\u00e9guli\u00e8rement et doit poursuivre ses efforts."
+                        },
+                        "EDUCATION MORALE ET CIVIQUE": {
+                            "moyenne": 20.0,
+                            "appreciation": "Romain travaille tr\u00e8s s\u00e9rieusement pour faire aboutir le projet annuel."
+                        },
+                        "MATHEMATIQUES": {
+                            "moyenne": 17.51,
+                            "appreciation": "Excellent trimestre, tant pour le travail que pour l'attitude en classe. Poursuivez dans ce sens."
+                        },
+                        "EDUCATION PHYSIQUE ET SPORTIVE": {
+                            "moyenne": 12.75,
+                            "appreciation": "Trimestre satisfaisant. Discret, Romain fait preuve de s\u00e9rieux lors des pratiques physiques. Il est \u00e0 l'\u00e9coute des conseils qui lui sont donn\u00e9s et essaie de les appliquer pour progresser. Continue !"
+                        },
+                        "I2D": {
+                            "moyenne": 16.17,
+                            "appreciation": "Voir l'appr\u00e9ciation d'IT"
+                        },
+                        "INNOVATION TECHNOL.": {
+                            "moyenne": 13.24,
+                            "appreciation": "\u00c9l\u00e8ve discret mais efficace. Votre implication en classe est tr\u00e8s s\u00e9rieuse. Bilan satsaisant. Continuez ainsi."
+                        },
+                        "LV2 CNED": {
+                            "moyenne": 5.0,
+                            "appreciation": "Romain travaille sa LVB (italien) tous les mercredis de 9 \u00e0 10h et les vendredis en semaine B de 9 \u00e0 10h. Il est toujours assidu et fait preuve de motivation. Au premier trimestre, il a obtenu la note de 05/20."
+                        },
+                        "Physique Chimie": {
+                            "moyenne": 16.61,
+                            "appreciation": "Excellent trimestre. Romain fournit un travail s\u00e9rieux et r\u00e9gulier. Il faut poursuivre dans cette optique."
+                        },
+                        "MATHS SPECIALITE": {
+                            "moyenne": 16.22,
+                            "appreciation": "Trmestre satisfaisant, travail s\u00e9rieux. Poursuivez ainsi."
+                        },
+                        "ANGLAIS LVA": {
+                            "moyenne": 12.0,
+                            "appreciation": "Faites un effort de participation."
+                        },
+                        "ETLV": {
+                            "moyenne": 16.25,
+                            "appreciation": "Trimestre tr\u00e8s satisfaisant, poursuivez ainsi !"
+                        }
+                    },
+                    "heures_absence_justifie": 3,
+                    "heures_absence_non_justifie": 0,
+                    "total_heures_absences": 3,
+                    "total_retards": 0,
+                    "total_exclusion_cours": 0,
+                    "total_exclusion_etablissement": 0,
+                    "moyenne_generale": 14.04,
+                    "appreciation_generale": "Un tr\u00e8s bon trimestre. Romain est un \u00e9l\u00e8ve appliqu\u00e9 et s\u00e9rieux qui progressera encore en s'impliquant un peu \u00e0 l'oral.",
+                    "appreciation_generale_score_Peed911/french_sentiment_analysis": 19.14891004562378
+                },
+                "T2": {
+                    "etablissement": {
+                        "nom": null,
+                        "adresse": null
+                    },
+                    "matiere": {
+                        "FRANCAIS": {
+                            "moyenne": null,
+                            "appreciation": null
+                        },
+                        "HISTOIRE & GEOGRAPH.": {
+                            "moyenne": null,
+                            "appreciation": null
+                        },
+                        "EDUCATION MORALE ET CIVIQUE": {
+                            "moyenne": null,
+                            "appreciation": null
+                        },
+                        "MATHEMATIQUES": {
+                            "moyenne": null,
+                            "appreciation": null
+                        },
+                        "EDUCATION PHYSIQUE ET SPORTIVE": {
+                            "moyenne": null,
+                            "appreciation": null
+                        },
+                        "I2D": {
+                            "moyenne": null,
+                            "appreciation": null
+                        },
+                        "INNOVATION TECHNOL.": {
+                            "moyenne": null,
+                            "appreciation": null
+                        },
+                        "LV2 CNED": {
+                            "moyenne": null,
+                            "appreciation": null
+                        },
+                        "Physique Chimie": {
+                            "moyenne": null,
+                            "appreciation": null
+                        },
+                        "MATHS SPECIALITE": {
+                            "moyenne": null,
+                            "appreciation": null
+                        },
+                        "ANGLAIS LVA": {
+                            "moyenne": null,
+                            "appreciation": null
+                        },
+                        "ETLV": {
+                            "moyenne": null,
+                            "appreciation": null
+                        }
+                    },
+                    "heures_absence_justifie": null,
+                    "heures_absence_non_justifie": null,
+                    "total_heures_absences": null,
+                    "total_retards": null,
+                    "total_exclusion_cours": null,
+                    "total_exclusion_etablissement": null,
+                    "moyenne_generale": null,
+                    "appreciation_generale": null,
+                    "appreciation_generale_score_Peed911/french_sentiment_analysis": null
+                },
+                "T3": {
+                    "etablissement": {
+                        "nom": "Lyc\u00e9e Blaise Pascal",
+                        "adresse": "27 BD BLAISE PASCAL"
+                    },
+                    "matiere": {
+                        "FRANCAIS": {
+                            "moyenne": 12.14,
+                            "appreciation": "Un ensemble correct. De bons r\u00e9sultats \u00e0 l'\u00e9crit. R\u00e9visez bien les textes pour l'oral afin d'obtenir une note qui puisse refl\u00e9ter v\u00e9ritablement votre niveau."
+                        },
+                        "HISTOIRE & GEOGRAPH.": {
+                            "moyenne": 13.0,
+                            "appreciation": "Ensemble convenable. Romain a travaill\u00e9 toute l'ann\u00e9e avec s\u00e9rieux."
+                        },
+                        "EDUCATION MORALE ET CIVIQUE": {
+                            "moyenne": 14.0,
+                            "appreciation": "Le projet annuel a \u00e9t\u00e9 r\u00e9alis\u00e9 de mani\u00e8re s\u00e9rieuse par Romain. Quelques difficult\u00e9s de compr\u00e9hension mais des efforts ont \u00e9t\u00e9 fournis par le groupe pour se corriger et progresser."
+                        },
+                        "MATHEMATIQUES": {
+                            "moyenne": 15.14,
+                            "appreciation": "Trimestre tr\u00e8s satisfaisant. Travail s\u00e9rieux, continuez ainsi."
+                        },
+                        "EDUCATION PHYSIQUE ET SPORTIVE": {
+                            "moyenne": 14.74,
+                            "appreciation": "Bon trimestre. De l'engagement et du s\u00e9rieux en badminton de la part de Romain. En revanche, un brin de rel\u00e2chement a \u00e9t\u00e9 constat\u00e9 au niveau des efforts fournis en musculation."
+                        },
+                        "I2D": {
+                            "moyenne": 14.38,
+                            "appreciation": "Voir l'appr\u00e9ciation d'IT"
+                        },
+                        "INNOVATION TECHNOL.": {
+                            "moyenne": 15.55,
+                            "appreciation": "Encore un tr\u00e8s bon trimestre que cela soit dans l'attitude ou dans le travail. Bilan annuel tr\u00e8s satisfaisant."
+                        },
+                        "LV2 CNED": {
+                            "moyenne": 13.5,
+                            "appreciation": "lan trimestriel tr\u00e8s satisfaisant. Investissement r\u00e9gulier et s\u00e9rieux. Tous les devoirs ont \u00e9t\u00e9 rendus. Continuez avec la m\u00eame motivation."
+                        },
+                        "Physique Chimie": {
+                            "moyenne": 16.62,
+                            "appreciation": "Tr\u00e8s bon trimestre et tr\u00e8s bonne ann\u00e9e dans l'ensemble. Romain a fourni un travail s\u00e9rieux et r\u00e9gulier tout au long de l'ann\u00e9e. Il faudra poursuivre l'an prochain."
+                        },
+                        "ANGLAIS LVA": {
+                            "moyenne": 10.0,
+                            "appreciation": "Travail s\u00e9rieux et r\u00e9gulier. Les efforts de participation ont \u00e9t\u00e9 maintenus."
+                        },
+                        "ETLV": {
+                            "moyenne": 11.75,
+                            "appreciation": "Trimestre convenable."
+                        }
+                    },
+                    "heures_absence_justifie": 5,
+                    "heures_absence_non_justifie": 0,
+                    "total_heures_absences": 5,
+                    "total_retards": 0,
+                    "total_exclusion_cours": 0,
+                    "total_exclusion_etablissement": 0,
+                    "moyenne_generale": 13.97,
+                    "appreciation_generale": "Un bon trimestre qui conclut une ann\u00e9e o\u00f9 Romain n'a pas m\u00e9nag\u00e9 ses efforts. C'est tr\u00e8s bien !",
+                    "appreciation_generale_score_Peed911/french_sentiment_analysis": 18.836909532546997
+                }
+            },
+            "epreuve": {
+                "nom": "",
+                "moyenne_finale": 0
+            }
+        },
+        "2022-2023": {
+            "trimestres": {
+                "T1": {
+                    "etablissement": {
+                        "nom": "Lyc\u00e9e Blaise Pascal",
+                        "adresse": "27 BD BLAISE PASCAL"
+                    },
+                    "matiere": {
+                        "PHILOSOPHIE": {
+                            "moyenne": 11.5,
+                            "appreciation": "Travail correct mais largement perfectible !"
+                        },
+                        "HISTOIRE & GEOGRAPH.": {
+                            "moyenne": 10.69,
+                            "appreciation": "Ensemble convenable. Romain peut progresser en \u00e9talant davantage ses r\u00e9visions et en h\u00e9sitant pas \u00e0 poser des questions en cours."
+                        },
+                        "EDUCATION MORALE ET CIVIQUE": {
+                            "moyenne": 20.0,
+                            "appreciation": "Romain travaille tr\u00e8s s\u00e9rieusement pour faire aboutir le projet annuel."
+                        },
+                        "MATHEMATIQUES": {
+                            "moyenne": 17.37,
+                            "appreciation": "Excellent trimestre, le travail est s\u00e9rieux et r\u00e9gulier."
+                        },
+                        "EDUCATION PHYSIQUE ET SPORTIVE": {
+                            "moyenne": 15.0,
+                            "appreciation": "Bon r\u00e9sultat en athl\u00e9tisme. L'attitude a \u00e9t\u00e9 positive tout au long de ce trimestre."
+                        },
+                        "2I2D": {
+                            "moyenne": 13.6,
+                            "appreciation": "hly : r\u00e9sultats tr\u00e8s satisfaisants , bravo , il faut poursuivre. NF : Bons r\u00e9sultats, \u00e9l\u00e8ve discret mais travailleur, continue."
+                        },
+                        "ENS SPE SIN": {
+                            "moyenne": 13.24,
+                            "appreciation": "Bonne attitude en cours, \u00e9l\u00e8ve s\u00e9rieux et impliqu\u00e9, continue tes efforts."
+                        },
+                        "LV2 CNED": {
+                            "moyenne": 18.0,
+                            "appreciation": "Romain travaille sa LVB (italien par le CNED) le lundi en semaine B avec un camarade de TSTMGB et le mardi de 13h \u00e0 14h avec trois camarades de seconde et de premi\u00e8re. Il est assidu et fait preuve de motivation."
+                        },
+                        "Physique Chimie": {
+                            "moyenne": 15.34,
+                            "appreciation": "Tr\u00e8s bon trimestre, continue ainsi !"
+                        },
+                        "MATHS SPECIALITE": {
+                            "moyenne": 16.22,
+                            "appreciation": "Trimestre satisfaisant, travail s\u00e9rieux. Poursuivez ainsi."
+                        },
+                        "ANGLAIS LVA": {
+                            "moyenne": 13.86,
+                            "appreciation": "Le travail est s\u00e9rieux , de l'attention en cours et une participation orale satisfaisante.poursuivez ainsi au prochain trimestre."
+                        },
+                        "ETLV": {
+                            "moyenne": 16.0,
+                            "appreciation": "L'ensemble est satisfaisant, un bon trimestre."
+                        }
+                    },
+                    "heures_absence_justifie": 17,
+                    "heures_absence_non_justifie": 0,
+                    "total_heures_absences": 17,
+                    "total_retards": 0,
+                    "total_exclusion_cours": 0,
+                    "total_exclusion_etablissement": 0,
+                    "moyenne_generale": 15.07,
+                    "appreciation_generale": "Bilan trimestriel tr\u00e8s satisfaisant au niveau des r\u00e9sultats, de l'investissement et de l'attitude face au travail. Poursuivez vos efforts dans toutes les disciplines.",
+                    "appreciation_generale_score_Peed911/french_sentiment_analysis": 18.70728611946106
+                },
+                "T2": {
+                    "etablissement": {
+                        "nom": "Lyc\u00e9e Blaise Pascal",
+                        "adresse": "27 BD BLAISE PASCAL"
+                    },
+                    "matiere": {
+                        "PHILOSOPHIE": {
+                            "moyenne": 11,
+                            "appreciation": "Travail \u00e9quivalent au premier trimestre. Vous pouvez faire encore mieux !"
+                        },
+                        "HISTOIRE & GEOGRAPH.": {
+                            "moyenne": 13.42,
+                            "appreciation": "Bon ensemble. Des progr\u00e8s dans les r\u00e9sultats. Du s\u00e9rieux en cours. Poursuivez ainsi."
+                        },
+                        "EDUCATION MORALE ET CIVIQUE": {
+                            "moyenne": 16.0,
+                            "appreciation": "Bon travail. Le projet avance m\u00eame s'il faudra \u00eatre plus rigoureux (pr\u00e9senter vos sources et vous plier aux exigences du d\u00e9bat argument\u00e9)."
+                        },
+                        "MATHEMATIQUES": {
+                            "moyenne": 15.93,
+                            "appreciation": "De nouveau un excellent trimestre, attitude et travail tr\u00e8s s\u00e9rieux."
+                        },
+                        "EDUCATION PHYSIQUE ET SPORTIVE": {
+                            "moyenne": 11.88,
+                            "appreciation": "R\u00e9sultats moyens malgr\u00e9 ton s\u00e9rieux tout au long de ce trimestre. Tes postures et l'ex\u00e9cution de tes mouvements en musculation ont parfois manqu\u00e9 de pr\u00e9cision."
+                        },
+                        "2I2D": {
+                            "moyenne": 11.17,
+                            "appreciation": "hly :un travail non rendu. NF: Tr\u00e8s bon trimestre."
+                        },
+                        "ENS SPE SIN": {
+                            "moyenne": 14.0,
+                            "appreciation": "Bonne attitude en cours, \u00e9l\u00e8ve s\u00e9rieux et impliqu\u00e9, continue tes efforts."
+                        },
+                        "LV2 CNED": {
+                            "moyenne": 18.0,
+                            "appreciation": "Encore un excellent trimestre, dans la continuit\u00e9 du pr\u00e9c\u00e9dent. Romain fournit un travail r\u00e9gulier et s\u00e9rieux en LVB italien (CNED). Il a rendu deux devoirs ce trimestre."
+                        },
+                        "Physique Chimie": {
+                            "moyenne": 15.11,
+                            "appreciation": "Encore un tr\u00e8s bon trimestre. Le travail en classe est s\u00e9rieux, rigoureux. Poursuivre ainsi !"
+                        },
+                        "MATHS SPECIALITE": {
+                            "moyenne": 15.81,
+                            "appreciation": "Un excellent trimestre, une attitude et un travail remarquables, f\u00e9licitations."
+                        },
+                        "ANGLAIS LVA": {
+                            "moyenne": 12.57,
+                            "appreciation": "De nouveau un bon trimestre, du s\u00e9rieux et une participation active en cours.L'ensemble est satisfaisant."
+                        },
+                        "ETLV": {
+                            "moyenne": 15.8,
+                            "appreciation": "L'ensemble est toujours aussi positif, un bon trimestre."
+                        }
+                    },
+                    "heures_absence_justifie": 0,
+                    "heures_absence_non_justifie": 0,
+                    "total_heures_absences": 0,
+                    "total_retards": 0,
+                    "total_exclusion_cours": 0,
+                    "total_exclusion_etablissement": 0,
+                    "moyenne_generale": 14.22,
+                    "appreciation_generale": "Bilan trimestriel tr\u00e8s satisfaisant au niveau des r\u00e9sultats et de l'attitude. Continuez avec la m\u00eame r\u00e9gularit\u00e9, en mettant l'accent sur la discipline 2i2d.",
+                    "appreciation_generale_score_Peed911/french_sentiment_analysis": 18.59831213951111
+                },
+                "T3": {
+                    "etablissement": {
+                        "nom": "Lyc\u00e9e Blaise Pascal",
+                        "adresse": "27 BD BLAISE PASCAL"
+                    },
+                    "matiere": {
+                        "PHILOSOPHIE": {
+                            "moyenne": 10.57,
+                            "appreciation": "Travail correct, mais vous n'avez pas exploit\u00e9 tout votre potentiel."
+                        },
+                        "HISTOIRE & GEOGRAPH.": {
+                            "moyenne": 12.25,
+                            "appreciation": "R\u00e9sultat convenable au devoir commun. \u00c9l\u00e8ve s\u00e9rieux."
+                        },
+                        "EDUCATION MORALE ET CIVIQUE": {
+                            "moyenne": 16.0,
+                            "appreciation": "Bon travail pour le projet d'EMC. Les m\u00e9thodes et les enjeux ont \u00e9t\u00e9 globalement compris. \u00c9l\u00e8ve s\u00e9rieux et investi."
+                        },
+                        "MATHEMATIQUES": {
+                            "moyenne": 17.75,
+                            "appreciation": "Trimestre tr\u00e8s satisfaisant. Le travail est s\u00e9rieux et r\u00e9gulier."
+                        },
+                        "EDUCATION PHYSIQUE ET SPORTIVE": {
+                            "moyenne": 13.5,
+                            "appreciation": "Trimestre satisfaisant au cours duquel ton attitude a \u00e9t\u00e9, une nouvelle fois, exemplaire."
+                        },
+                        "2I2D": {
+                            "moyenne": 13.0,
+                            "appreciation": ""
+                        },
+                        "ENS SPE SIN": {
+                            "moyenne": 10.0,
+                            "appreciation": "El\u00e8ve s\u00e9rieux et tr\u00e8s impliqu\u00e9 dans le projet."
+                        },
+                        "LV2 CNED": {
+                            "moyenne": 14.0,
+                            "appreciation": "Bilans trimestriel et annuel tr\u00e8s satisfaisant. Vous avez r\u00e9ussi \u00e0 d\u00e9poser tous vos devoirs avant la date butoir du 30 avril. Tout au long de l'ann\u00e9e, vous avez fait preuve d'autonomie. Par ailleurs, l'aide technique que vous avez apport\u00e9e \u00e0 vos camarades du CNED a \u00e9t\u00e9 tr\u00e8s appr\u00e9ciable."
+                        },
+                        "Physique Chimie": {
+                            "moyenne": 15.9,
+                            "appreciation": "Tr\u00e8s bon travail. Toujours aussi s\u00e9rieux et rigoureux. Des efforts \u00e0 r\u00e9aliser sur l'oral."
+                        },
+                        "MATHS SPECIALITE": {
+                            "moyenne": 13.57,
+                            "appreciation": "Travail et attitude satisfaisants."
+                        },
+                        "ANGLAIS LVA": {
+                            "moyenne": 12.6,
+                            "appreciation": "L'ensemble demeure satisfaisant, du s\u00e9rieux et de la r\u00e9gularit\u00e9 dans le travail."
+                        },
+                        "ETLV": {
+                            "moyenne": 12.67,
+                            "appreciation": "Des pr\u00e9sentations orales de qualit\u00e9, un bon trimestre."
+                        }
+                    },
+                    "heures_absence_justifie": 6,
+                    "heures_absence_non_justifie": 0,
+                    "total_heures_absences": 6,
+                    "total_retards": 0,
+                    "total_exclusion_cours": 0,
+                    "total_exclusion_etablissement": 0,
+                    "moyenne_generale": 13.48,
+                    "appreciation_generale": "Des r\u00e9sultats tr\u00e8s satisfaisants. Investissement r\u00e9gulier et s\u00e9rieux dans l'ensemble des disciplines.",
+                    "appreciation_generale_score_Peed911/french_sentiment_analysis": 18.97954821586609
+                }
+            },
+            "epreuve": {
+                "nom": "",
+                "moyenne_finale": 0
+            }
+        }
+    }
+}
