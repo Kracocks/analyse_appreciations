@@ -1,5 +1,5 @@
 from .app import app, db
-from .models import Graphique, ModeleForm, ModeleDB, get_last_modele_id
+from .models import Graphique, ModeleForm, ModeleDB, get_last_modele_id, get_modeles
 from flask import render_template,redirect, url_for, Response
 import os
 from flask import request
@@ -8,14 +8,13 @@ import json
 
 graphique = Graphique()
 
-modeles_disponibles = list(graphique.modele_ia.modeles_disponibles.keys())
-
-graphique.modifier_modele(modeles_disponibles[0])
+graphique.modifier_modele("Peed911/french_sentiment_analysis")
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     fichiers_recents = [f for f in os.listdir(app.config["UPLOAD_PATH"]) if os.path.isfile(os.path.join(app.config["UPLOAD_PATH"], f))]
     filename = graphique.donnees.fichier
+    modeles_disponibles = [modele.nom for modele in get_modeles()]
     modele_selectionne = graphique.modele_ia.modele_choisi if graphique.modele_ia.modele_choisi != "" else modeles_disponibles[0]
 
     if request.method == 'POST':
