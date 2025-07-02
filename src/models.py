@@ -4,13 +4,14 @@ import plotly
 import plotly.graph_objs as go
 import numpy as np
 import pandas as pd
+from huggingface_hub import repo_exists
 from transformers import pipeline
 from datasets import load_dataset
 import time
 import textwrap
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, StringField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, ValidationError
 
 modeles_disponibles = []
 
@@ -559,10 +560,16 @@ class ModeleDB(db.Model):
                 if score["label"].upper() == "POSITIVE":
                     res.append(round(score["score"] * 20, 2))
         return res
-    
+
+# Validators
+def valider_nom_modele(form, field):
+    if not repo_exists(field.data):
+        raise ValidationError("Ce modèle n'existe pas sur HuggingFace")
+
+# Formulaires
 class ModeleForm(FlaskForm):
     id = HiddenField("id")
-    nom = StringField("Nom", validators=[DataRequired()])
+    nom = StringField("Nom", validators=[DataRequired(), valider_nom_modele])
 
 def get_modeles():
     return ModeleDB.query.all()
