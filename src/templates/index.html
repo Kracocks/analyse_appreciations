@@ -84,6 +84,16 @@
 
     <!-- Tout les éléments qui seront affiché lorsqu'un fichier à été sélectionné comme le choix du modèle, le graphique et la bar de chargement -->
     <div id="graphique-zone">
+        <form method="post" id="eleve_form">
+            <label for="eleve_choice">Choisir un élève</label>
+            <select name="eleve_choice" id="eleve_choice">
+                <option value="" {% if eleve_selectionne == None %}selected{% endif %}>Choisir un élève</option>
+                {% for eleve in eleve_disponibles %}
+                <option value="{{ eleve['INE'] }}" {% if eleve==eleve_selectionne %}selected{% endif %}>{{ eleve['nom'] + ' ' + eleve['prenom'] }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        <script src="{{url_for('static', filename='on_eleve_change.js')}}"></script>
         <!-- Selection de paramètres pour le graphique -->
         <form method="post" id="parametre_form">
             <label for="modeles_choice">Choisir un modele</label>
@@ -95,6 +105,7 @@
         </form>
         <script src="{{url_for('static', filename='on_parametre_change.js')}}"></script>
 
+        {% if eleve_selectionne %}
         <!-- Zone du graphique -->
         <div class="chart" id="bargraph"></div>
         <p id="selected_text"></p>
@@ -110,10 +121,11 @@
         {% if fichier_charge != "" %}
         <script src="{{url_for('static', filename='load_graph.js')}}"></script>
         {% endif %}
+        {% endif %}
     </div>
 
     <!-- Affichage de graphique-zone -->
-    {% if fichier_charge != "" %}
+    {% if fichier_charge != "" and (eleve_selectionne != "" or eleve_selectionne != None) %}
     <script>
         graphique_zone = document.getElementById("graphique-zone")
         graphique_zone.style.display = "block"

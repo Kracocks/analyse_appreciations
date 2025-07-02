@@ -3,7 +3,6 @@ import plotly
 import plotly.graph_objs as go
 import numpy as np
 import pandas as pd
-from.app import modeles_disponibles
 from huggingface_hub import repo_exists
 from transformers import pipeline
 from datasets import load_dataset
@@ -19,7 +18,7 @@ class Graphique:
         """
         self.nom = ""
         self.variables = ["moyennes générales", "appréciations générales"]
-        self.donnees = Donnees("")
+        self.donnees = Donnees()
         self.modele_choisi = ModeleDB()
         self.chargement = Chargement()
 
@@ -315,13 +314,16 @@ class Graphique:
         return texte
 
 class Donnees:
-    def __init__(self, fichier:str):
+    def __init__(self):
         """Le constructeur de la classe Donnees
 
         Args:
             fichier (str): Le fichier à charger
         """
-        self.modfier_fichier(fichier)
+        self.fichier = None
+        self.donnees = None
+        self.eleve_selectionne = None
+        self.donnees_eleve = None
 
     def modfier_fichier(self, new_fichier:str) -> bool:
         """Modifier les donnée utilisé par l'application à partir d'un fichier JSON. Le JSON doit respecter une architecture et renverra False si l'architecture n'est pas correcte ou si le fichier n'est pas un JSON
@@ -333,6 +335,8 @@ class Donnees:
             bool: Renvoi True si les données ont été modifiées. Sinon False.
         """
         self.fichier = new_fichier
+        self.eleve_selectionne = None
+        self.donnees_eleve = None
         if (self.fichier != ""):
             with open(self.fichier, 'r') as file:
                 data = json.load(file)
@@ -350,6 +354,30 @@ class Donnees:
         """
         # TODO Faire la vérification du contenu du fichier
         return True
+    
+    def modifier_eleve(self, ine_eleve:str):
+        """Modifie les données utilisé
+
+        Args:
+            ine_eleve (str): l'INE de l'élève à qui prendre les données
+        """
+        if ine_eleve == "":
+            self.eleve_selectionne = None
+        elif self.donnees != None:
+            for eleve in self.donnees:
+                if eleve["INE"] == ine_eleve:
+                    self.donnees_eleve = eleve
+                    eleve_selectionne = {"nom": eleve["nom"], "prenom": eleve["prenom"], "INE": eleve["INE"]}
+                    self.eleve_selectionne = eleve_selectionne
+
+    def get_eleves(self):
+        """Permet d'avoir tout les élèves qui se trouve dans les données
+        """
+        res = []
+        if self.donnees != None:
+            for eleve in self.donnees:
+                res.append({"nom": eleve["nom"], "prenom": eleve["prenom"], "INE": eleve["INE"]})
+        return res
 
     def get_annees_scolaire(self) -> list[str]:
         """Permet d'avoir toute les années scolaire enregistré dans le fichier
@@ -358,7 +386,7 @@ class Donnees:
             list[str]: Les années scolaire dans le fichier
         """
         annees = []
-        for annee in self.donnees.get("annees_scolaire"):
+        for annee in self.donnees_eleve.get("annees_scolaire"):
             annees.append(annee)
         return annees
 
@@ -372,7 +400,7 @@ class Donnees:
             list[str]: Tout les trimestres enregistré d'une année scolaire
         """
         trimestres = []
-        for trimestre in self.donnees["annees_scolaire"][annee_scolaire]["trimestres"]:
+        for trimestre in self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"]:
             trimestres.append(trimestre)
         return trimestres
 
@@ -388,8 +416,8 @@ class Donnees:
             float: La moyenne
         """
         if matiere:
-            return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["moyenne"]
-        return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["moyenne_generale"]
+            return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["moyenne"]
+        return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["moyenne_generale"]
 
     def get_appreciation(self, annee_scolaire:str, trimestre:str, matiere:str = None) -> str:
         """Permet d'obtenir l'appréciation à partir de l'année scolaire et du trimestre sélectionné. Si aucune matière n'est sélectionné, on choisi l'appréciation générale sinon on choisi la moyenne de l'appréciation
@@ -403,8 +431,8 @@ class Donnees:
             str: L'appréciation
         """
         if matiere:
-            return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["appreciation"]
-        return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["appreciation_generale"]
+            return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["appreciation"]
+        return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["appreciation_generale"]
 
     def get_matieres(self, annee_scolaire:str, trimestre:str) -> set[str]:
         """Permet d'obtenir toute les matières à partir de l'année dcolaire et du trimestre selectionné
@@ -416,7 +444,7 @@ class Donnees:
         Returns:
             set[str]: Les matières du trimestre choisi de l'année scolaire choisi
         """
-        return set(self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"].keys())
+        return set(self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"].keys())
     
     def get_all_matieres(self) -> set[str]:
         """Permet d'obtenir toute les matières présente dans le fichier
@@ -441,7 +469,7 @@ class Donnees:
         Returns:
             bool: Return True si la matière existe dans le trimestre de l'année scolaire choisi sinon return False
         """
-        return matiere in self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"].keys()
+        return matiere in self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"].keys()
 
     def get_score_appreciation(self, annee_scolaire:str, trimestre:str, modele_ia:str, matiere:str = None) -> float:
         """Permet d'obtenir le score d'une appreciation à partir de l'année scolaire et du trimestre sélectionné. Si aucune matière n'est sélectionné, on choisi le score de l'appréciation générale sinon on choisi le score de l'appréciation de la matière choisi
@@ -456,8 +484,8 @@ class Donnees:
             float: Le score stocké dans le JSON
         """
         if matiere:
-            return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["appreciation_score_" + modele_ia]
-        return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["appreciation_generale_score_" + modele_ia]
+            return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["appreciation_score_" + modele_ia]
+        return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["appreciation_generale_score_" + modele_ia]
 
     def score_existe(self, annee_scolaire:str, trimestre:str, modele_ia:str, matiere:str = None) -> bool:
         """Permet de savoir si le score d'une appréciation à déjà été calculé
@@ -472,9 +500,9 @@ class Donnees:
             bool: Retourne True si le score calculé par l'ia choisi existe, Sinon False
         """
         if matiere:
-            return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere].get("appreciation_score_" + modele_ia) != None
+            return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere].get("appreciation_score_" + modele_ia) != None
         else:
-            return self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre].get("appreciation_generale_score_" + modele_ia) != None
+            return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre].get("appreciation_generale_score_" + modele_ia) != None
 
     def set_score_appreciation(self, annee_scolaire:str, trimestre:str, modele_ia:str, score:float, matiere:str = None):
         """Ajoute le score dans le JSON
@@ -487,23 +515,23 @@ class Donnees:
             matiere (str, optional): La matière sélectionné. Si aucune, prendre l'appréciation générale. none par défault.
         """
         if matiere:
-            self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["appreciation_score_" + modele_ia] = score
+            self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["appreciation_score_" + modele_ia] = score
         else:
-            self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["appreciation_generale_score_" + modele_ia] = score
+            self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["appreciation_generale_score_" + modele_ia] = score
         with open(self.fichier, 'r+') as f:
             f.seek(0)
-            json.dump(self.donnees, f, indent=4)
+            json.dump(self.donnees_eleve, f, indent=4)
             f.truncate()
 
     def get_nb_total_donnees(self) -> int:
         total = 0
-        for annee_scolaire in self.donnees["annees_scolaire"]:
-            for trimestre in self.donnees["annees_scolaire"][annee_scolaire]["trimestres"]:
+        for annee_scolaire in self.donnees_eleve["annees_scolaire"]:
+            for trimestre in self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"]:
                 # On va prendre toute les "feuilles" dans un trimestre on enleve juste 
                 # les feuilles "score" (car je considère que score et appréciation représente 
                 # la même données) et "matiere" puis on prend tout les matières et on les 
                 # multiplies par deux car il y a deux données par matière 
-                total += (len(self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]) - 2) + len(self.donnees["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"]) * 2
+                total += (len(self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]) - 2) + len(self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"]) * 2
         
         return total
 

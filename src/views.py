@@ -24,6 +24,8 @@ def index():
     modele_selectionne = graphique.modele_choisi.nom if graphique.modele_choisi.nom != None else modeles_disponibles[0].nom
 
     if request.method == 'POST':
+        
+        test = request.form
 
         file = request.files.get('file')
 
@@ -40,8 +42,12 @@ def index():
         # Réafficher le tableau
         if request.form.get("modeles_choice"):
             modele_selectionne = request.form.get("modeles_choice")
-            graphique.modele_choisi = get_modele_from_nom(modele_selectionne)
-        
+            graphique.modifier_modele(get_modele_from_nom(modele_selectionne))
+
+        if request.form.get("eleve_choice") != None:
+            ine_eleve = request.form.get("eleve_choice")
+            graphique.donnees.modifier_eleve(ine_eleve)
+
     f=ModeleForm()
 
     return render_template("index.html",
@@ -50,6 +56,8 @@ def index():
                            fichiers_recents=fichiers_recents,
                            modele_selectionne=modele_selectionne,
                            notes_ia=graphique.modele_choisi.correlation,
+                           eleve_disponibles=graphique.donnees.get_eleves(),
+                           eleve_selectionne=graphique.donnees.eleve_selectionne,
                            form=f)
 
 @app.route('/progress') # Mettre a jour la bar de progression
@@ -59,7 +67,7 @@ def progress():
         statut = graphique.chargement.status
         data = json.dumps({"progression": progression, "statut":statut})
         yield "data:" + str(data) + "\n\n"
-    
+
     return Response(generate(), mimetype='text/event-stream')
 
 @app.route("/get-graph") # Permetre de récupérer le graphique
@@ -79,7 +87,7 @@ def save_modele():
         modele.pipeline = pipeline("text-classification", model="ac0hik/Sentiment_Analysis_French", top_k=None)
         db.session.add(modele)
         db.session.commit()
-        
+
         modeles_disponibles.append(modele)
     return redirect(url_for("index"))
 
@@ -94,5 +102,5 @@ def correler_modele():
             modeles_disponibles[i] = modele
 
     db.session.commit()
-            
+
     return redirect(url_for("index"))
