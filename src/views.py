@@ -42,7 +42,7 @@ def index():
         # Réafficher le tableau
         if request.form.get("modeles_choice"):
             modele_selectionne = request.form.get("modeles_choice")
-            graphique.modifier_modele(get_modele_from_nom(modele_selectionne))
+            graphique.modifier_modele(modele_selectionne)
 
         if request.form.get("eleve_choice") != None:
             ine_eleve = request.form.get("eleve_choice")
