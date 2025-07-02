@@ -75,7 +75,7 @@
                 <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Ajouter">
             </form>
             <h2 class="calcul-correlation">Coefficient de corrélation</h2>
-            <form role="form" method="POST" action="{{ url_for('correler_modele') }}">
+            <form role="form" method="post" action="{{ url_for('correler_modele') }}">
                 {{ form.hidden_tag() }}
                 <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Calculer les corrélations">
             </form>
@@ -89,7 +89,7 @@
             <label for="modeles_choice">Choisir un modele</label>
             <select name="modeles_choice" id="modeles_choice">
                 {% for modele in modeles_disponibles %}
-                <option value="{{ modele }}" {% if modele==modele_selectionne %}selected{% endif %}>{{ modele }} ; corrélation : {{ notes_ia[modele] }}</option>
+                <option value="{{ modele.nom }}" {% if modele.nom==modele_selectionne %}selected{% endif %}>{{ modele.nom }} ; corrélation : {{ modele.correlation }}</option>
                 {% endfor %}
             </select>
         </form>

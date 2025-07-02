@@ -3,6 +3,7 @@ import plotly
 import plotly.graph_objs as go
 import numpy as np
 import pandas as pd
+from.app import modeles_disponibles
 from huggingface_hub import repo_exists
 from transformers import pipeline
 from datasets import load_dataset
@@ -557,6 +558,36 @@ class ModeleDB(db.Model):
                 if score["label"].upper() == "POSITIVE":
                     res.append(round(score["score"] * 20, 2))
         return res
+
+    def noter(self) -> float:
+        """Permet de noter automatiquement un modèle d'IA. Pour cela on va prendre le dataset eltorio/appreciation sur HuggingFace 
+        qui est utilisé pour lister des appréciations et leur donner un score sur 10 sur 3 catégories : le comportement, la participation et 
+        le travail. Ensuite on va donner ces appréciations aux modèles d'IA qui vont nous donner une liste de scores sur 20 puis on va mettres 
+        les 3 notes en une notes sur 20. Pour finir on va calculer le coefficient de correlation en les scores que nous ont donné les IA.
+
+        Returns:
+            float: Le taux de précision.
+        """
+        dstrain = load_dataset("eltorio/appreciation", split="train")
+        dsvalid = load_dataset("eltorio/appreciation", split="validation")
+        
+        commentaires = dstrain["commentaire"] + dsvalid["commentaire"]
+        comportements = dstrain["comportement 0-10"] + dsvalid["comportement 0-10"]
+        participations = dstrain["participation 0-10"] + dsvalid["participation 0-10"]
+        travails = dstrain["travail 0-10"] + dsvalid["travail 0-10"]
+
+        scores = self.analyser(commentaires)
+
+        notes = []
+        for i in range(len(comportements)):
+            total = comportements[i] + participations[i] + travails[i] # Le total vaut au maximum 30
+            # Mettre le résultat sur 20
+            note = total * 20 / 30
+            notes.append(round(note, 2))
+
+        x = pd.Series(scores)
+        y = pd.Series(notes)
+        return format(float(x.corr(y)), '5g')
 
 # Validators
 def valider_nom_modele(form, field):
