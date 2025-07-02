@@ -1,14 +1,20 @@
 from flask import Flask
 from flask_dropzone import Dropzone
 from flask_sqlalchemy import SQLAlchemy
+from transformers import pipeline
 import os.path
+
+def mkpath(p):
+    return os.path.normpath(os.path.join(os.path.dirname(__file__), p))
 
 MAXIMUM_FILE_SIZE = 15 # En MB
 
 app = Flask(__name__)
 
-def mkpath(p):
-    return os.path.normpath(os.path.join(os.path.dirname(__file__), p))
+app.config["SQLALCHEMY_DATABASE_URI"] = ('sqlite:///'+mkpath('../app.db'))
+db = SQLAlchemy(app)
+
+from .models import Graphique
 
 app.config.update(
     DROPZONE_REDIRECT_VIEW = 'index',
@@ -24,11 +30,18 @@ app.config.update(
     
     UPLOAD_PATH = "uploads",
     
-    SQLALCHEMY_DATABASE_URI = ('sqlite:///'+mkpath('../app.db')),
-    
     SECRET_KEY = "s;8yY2.5ge}PH0:"
 )
 
-db = SQLAlchemy(app)
+modeles_disponibles = []
+graphique = Graphique()
+
+with app.app_context():
+    from .models import get_modeles
+    for modele in get_modeles():
+        modele.pipeline = pipeline("text-classification", model=modele.nom, top_k=None) 
+        modeles_disponibles.append(modele)
+    
+    graphique.modifier_modele("Peed911/french_sentiment_analysis")
 
 dropzone = Dropzone(app)

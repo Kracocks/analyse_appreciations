@@ -1,20 +1,11 @@
-from .app import app, db
-from .models import Graphique, ModeleForm, ModeleDB, get_last_modele_id, get_modeles, get_modele_from_nom, modeles_disponibles
+from .app import app, db, graphique, modeles_disponibles
+from .models import Graphique, ModeleForm, ModeleDB, get_last_modele_id, get_modeles, get_modele_from_nom
 from flask import render_template,redirect, url_for, Response
 from transformers import pipeline
 import os
 from flask import request
 from werkzeug.utils import secure_filename
 import json
-
-graphique = Graphique()
-
-with app.app_context():
-    graphique.modeles_disponibles = get_modeles()
-    for modele in modeles_disponibles:
-        modele.pipeline = pipeline("text-classification", model=modele.nom, top_k=None)
-
-    graphique.modifier_modele("Peed911/french_sentiment_analysis")
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -80,7 +71,6 @@ def save_modele():
         db.session.add(modele)
         db.session.commit()
         
-        global modeles_disponibles
         modeles_disponibles.append(modele)
     return redirect(url_for("index"))
 

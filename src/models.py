@@ -1,4 +1,3 @@
-from .app import db, app
 import json
 import plotly
 import plotly.graph_objs as go
@@ -13,8 +12,6 @@ from flask_wtf import FlaskForm
 from wtforms import HiddenField, StringField
 from wtforms.validators import DataRequired, ValidationError
 
-modeles_disponibles = []
-
 class Graphique:
     def __init__(self):
         """Le contructeur de la classe Graphique
@@ -22,7 +19,6 @@ class Graphique:
         self.nom = ""
         self.variables = ["moyennes générales", "appréciations générales"]
         self.donnees = Donnees("")
-        self.modeles_disponibles = []
         self.modele_choisi = ModeleDB()
         self.chargement = Chargement()
 
@@ -531,6 +527,7 @@ class Chargement:
         self.temp_prog += added_progression
         self.progression = round(self.temp_prog)
 
+from .app import db
 class ModeleDB(db.Model):
     __tablename__ = "modele"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
