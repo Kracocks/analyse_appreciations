@@ -11,6 +11,7 @@
 
     <!-- Install bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
     <!-- Install plotly.js -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -18,63 +19,67 @@
 
     <!-- Load dropzone-->
     {{ dropzone.load_css() }}
-    {{ dropzone.style('border: 2px dashed #0087F7; border-radius : 20px; min-height: 15%; max-width: 25%') }}
+    {{ dropzone.style('border: 2px dashed #0087F7; border-radius : 20px; min-height: 15%; max-width: 75%') }}
 </head>
 
 <body>
-    <div id="file-input">
-        <!-- Selection de fichier -->
-        <script>
-            dropzone_message = ">>> Glissez-déposez ou cliquez pour sélectionner <<< <br><br>"
-            temp = "{{ fichier_charge | safe }}" != "" ? "Fichier chargé : {{ fichier_charge | safe }}" : ""
-            dropzone_message = dropzone_message + temp
-        </script>
+    <div id="inputs">
+        <div id="file-input">
+            <h2>Importer un fichier</h2>
+            <!-- Selection de fichier -->
+            <script>
+                dropzone_message = ">>> Glissez-déposez ou cliquez pour sélectionner <<< <br><br>"
+                temp = "{{ fichier_charge | safe }}" != "" ? "Fichier chargé : {{ fichier_charge | safe }}" : ""
+                dropzone_message = dropzone_message + temp
+            </script>
 
-        <!-- affichage de la dropzone-->
-        {{ dropzone.create(action='index') }}
-        {{ dropzone.load_js() }}
-        {{ dropzone.config(
-            custom_options='addRemoveLinks: true, 
-                            dictDefaultMessage: dropzone_message') }}
+            <!-- affichage de la dropzone-->
+            {{ dropzone.create(action='index') }}
+            {{ dropzone.load_js() }}
+            {{ dropzone.config(
+                custom_options='addRemoveLinks: true, 
+                                dictDefaultMessage: dropzone_message') }}
 
-        <!-- Selection de fichier récent -->
-        <form method="post" enctype="multipart/form-data" id="recent_file_form">
-            <label for="recent_files_choice">Choisir un fichier récemment utilisé</label>
-            <select name="recent_files_choice" id="recent_files_choice">
-                <option value="">Aucun fichier choisi</option>
-                {% for fichier_recent in fichiers_recents %}
-                <option value="{{ fichier_recent }}">{{ fichier_recent }}</option>
-                {% endfor %}
-            </select>
-        </form>
-        <script src="{{url_for('static', filename='on_file_selected.js')}}"></script>
-    </div>
+            <!-- Selection de fichier récent -->
+            <form method="post" enctype="multipart/form-data" id="recent_file_form">
+                <label for="recent_files_choice">Choisir un fichier récemment utilisé</label>
+                <select name="recent_files_choice" id="recent_files_choice">
+                    <option value="">Aucun fichier choisi</option>
+                    {% for fichier_recent in fichiers_recents %}
+                    <option value="{{ fichier_recent }}">{{ fichier_recent }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+            <script src="{{url_for('static', filename='on_file_selected.js')}}"></script>
+        </div>
 
-    <!-- Ajout de modèles et calcul de leur corrélation -->
-    <div id="model-input">
-        <form role="form" method="post" action="{{ url_for('save_modele') }}">
-            {{ form.hidden_tag() }}
-            <div class={% if form.nom.errors %}
-                        "form-group has-error"
-                        {% else %}
-                        "form-group"
-                        {% endif %}>
-                {{ form.nom.label }} {{ form.nom(size=50, class_="form-control") }}
-            </div>
-            {% if form.nom.errors%}
-            <ul class="list-group">
-                {% for e in form.nom.errors%}
-                <li class="list-group-item list-group-item-danger">{{e}}</li>
-                {% endfor%}
-            </ul>
-            {% endif%}
-            <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Ajouter">
-        </form>
-        <h1 class="calcul-correlation">Coefficient de corrélation</h1>
-        <form role="form" method="POST" action="{{ url_for('correler_modele') }}">
-            {{ form.hidden_tag() }}
-            <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Calculer les corrélations">
-        </form>
+        <!-- Ajout de modèles et calcul de leur corrélation -->
+        <div id="model-input">
+            <h2 class="ajout-modele">Ajouter un modèle</h2>
+            <form role="form" method="post" action="{{ url_for('save_modele') }}">
+                {{ form.hidden_tag() }}
+                <div class={% if form.nom.errors %}
+                            "form-group has-error"
+                            {% else %}
+                            "form-group"
+                            {% endif %}>
+                    {{ form.nom.label }} {{ form.nom(size=50, class_="form-control") }}
+                </div>
+                {% if form.nom.errors%}
+                <ul class="list-group">
+                    {% for e in form.nom.errors%}
+                    <li class="list-group-item list-group-item-danger">{{e}}</li>
+                    {% endfor%}
+                </ul>
+                {% endif%}
+                <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Ajouter">
+            </form>
+            <h2 class="calcul-correlation">Coefficient de corrélation</h2>
+            <form role="form" method="POST" action="{{ url_for('correler_modele') }}">
+                {{ form.hidden_tag() }}
+                <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Calculer les corrélations">
+            </form>
+        </div>
     </div>
 
     <!-- Tout les éléments qui seront affiché lorsqu'un fichier à été sélectionné comme le choix du modèle, le graphique et la bar de chargement -->
