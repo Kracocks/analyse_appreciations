@@ -615,7 +615,7 @@ class ModeleDB(db.Model):
 
         x = pd.Series(scores)
         y = pd.Series(notes)
-        return format(float(x.corr(y)), '5g')
+        return round(float(x.corr(y)), 2)
 
 # Validators
 def valider_nom_modele(form, field):
