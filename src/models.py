@@ -270,7 +270,7 @@ class Graphique:
                                                   hovertemplate="%{customdata}<br>note IA : %{y}",
                                                   line=dict(color=couleur)
                                                 ))
-            if nom.startswith("appréciations "):
+            if nom == "appréciations générales":
                 for i in range(len(trimestres)):
                             data.add_annotation(
                                 x=trimestres[i], y=valeurs["scores"][i],
@@ -307,7 +307,7 @@ class Graphique:
     def wrap(self, text):
         if (text == None):
             return None
-        wrap = textwrap.wrap(text, width=40)
+        wrap = textwrap.wrap(text, width=32)
         texte = ""
         for text_part in wrap:
             texte += text_part + "<br>"
