@@ -55,6 +55,7 @@
 
         <!-- Ajout de modèles et calcul de leur corrélation -->
         <div id="model-input">
+            <section>
             <h2 class="ajout-modele">Ajouter un modèle</h2>
             <form role="form" method="post" action="{{ url_for('save_modele') }}">
                 {{ form.hidden_tag() }}
@@ -74,11 +75,7 @@
                 {% endif%}
                 <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Ajouter">
             </form>
-            <h2 class="calcul-correlation">Coefficient de corrélation</h2>
-            <form role="form" method="post" action="{{ url_for('correler_modele') }}">
-                {{ form.hidden_tag() }}
-                <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Calculer les corrélations">
-            </form>
+            </section>
             <section>
                 <h2>Paramètres</h2>
                 <form method="post" id="eleve_form">
@@ -101,6 +98,10 @@
                     </select>
                 </form>
                 <script src="{{url_for('static', filename='on_parametre_change.js')}}"></script>
+                <form role="form" method="post" action="{{ url_for('correler_modele') }}">
+                    {{ form.hidden_tag() }}
+                    <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Calculer les corrélations">
+                </form>
             </section>
         </div>
     </aside>

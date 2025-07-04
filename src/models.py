@@ -625,7 +625,7 @@ def valider_nom_modele(form, field):
 # Formulaires
 class ModeleForm(FlaskForm):
     id = HiddenField("id")
-    nom = StringField("Nom", validators=[DataRequired(), valider_nom_modele])
+    nom = StringField("Nom du modèle provenant de HuggingFace", validators=[DataRequired(), valider_nom_modele])
 
 def get_modeles():
     return ModeleDB.query.all()
