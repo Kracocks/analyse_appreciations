@@ -14,3 +14,9 @@ body>article {
     margin: auto;
     padding: auto;
 }
+
+#add_modele_form>div>div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}

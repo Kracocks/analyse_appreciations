@@ -53,19 +53,21 @@
             <script src="{{url_for('static', filename='on_file_selected.js')}}"></script>
         </div>
 
-        <!-- Ajout de modèles et calcul de leur corrélation -->
         <div id="model-input">
+            <!-- Ajout de modèles -->
             <section>
             <h2 class="ajout-modele">Ajouter un modèle</h2>
-            <form role="form" method="post" action="{{ url_for('save_modele') }}">
+            <form role="form" method="post" action="{{ url_for('save_modele') }}" id="add_modele_form">
                 {{ form.hidden_tag() }}
-                <div class={% if form.nom.errors %}
-                            "form-group has-error"
-                            {% else %}
-                            "form-group"
-                            {% endif %}>
-                    {{ form.nom.label }} {{ form.nom(size=50, class_="form-control") }}
+                
+                <div class={% if form.nom.errors %}"form-group has-error"{% else %}"form-group"{% endif %}>
+                    {{ form.nom.label }}
+                    <div>
+                        {{ form.nom(size=50, class_="form-control") }}
+                        <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Ajouter">
+                    </div>
                 </div>
+
                 {% if form.nom.errors%}
                 <ul class="list-group">
                     {% for e in form.nom.errors%}
@@ -73,9 +75,9 @@
                     {% endfor%}
                 </ul>
                 {% endif%}
-                <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Ajouter">
             </form>
             </section>
+            <!-- Sélection d'élève, sélection de modèle et calcul de leurs corrélations -->
             <section>
                 <h2>Paramètres</h2>
                 <form method="post" id="eleve_form">
