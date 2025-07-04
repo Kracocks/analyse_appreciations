@@ -110,7 +110,7 @@
 
     <article id="graphique-zone">
         <!-- Tout les éléments qui seront affiché lorsqu'un fichier à été sélectionné comme le choix du modèle, le graphique et la bar de chargement -->
-        <div id="graphique-zone">
+        <div id="graphique">
             {% if eleve_selectionne %}
             <!-- Zone du graphique -->
             <div class="chart" id="bargraph"></div>
@@ -129,18 +129,28 @@
             {% endif %}
             {% endif %}
         </div>
+        <p id="informations"></p>
     </article>
 
     <!-- Affichage de graphique-zone -->
-    {% if fichier_charge != "" and (eleve_selectionne != "" or eleve_selectionne != None) %}
     <script>
-        graphique_zone = document.getElementById("graphique-zone")
-        graphique_zone.style.display = "block"
+        var text_info = document.getElementById("informations");
+        var graphique_zone = document.getElementById("graphique");
+    </script>
+    {% if fichier_charge == "" %}
+    <script>
+        text_info.textContent = "Aucun fichier chargé"
+        graphique_zone.style.display = "none"
+    </script>
+    {% elif eleve_selectionne == "" or eleve_selectionne == None %}
+    <script>
+        text_info.textContent = "Aucun élève sélectionné"
+        graphique_zone.style.display = "none"
     </script>
     {% else %}
     <script>
-        graphique_zone = document.getElementById("graphique-zone")
-        graphique_zone.style.display = "none"
+        text_info.textContent = ""
+        graphique_zone.style.display = "block"
     </script>
     {% endif %}
 </body>
