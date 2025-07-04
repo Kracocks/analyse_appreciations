@@ -23,7 +23,7 @@
 </head>
 
 <body>
-    <div id="inputs">
+    <aside id="inputs">
         <div id="file-input">
             <h2>Importer un fichier</h2>
             <!-- Selection de fichier -->
@@ -79,51 +79,54 @@
                 {{ form.hidden_tag() }}
                 <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Calculer les corrélations">
             </form>
+            <section>
+                <h2>Paramètres</h2>
+                <form method="post" id="eleve_form">
+                    <label for="eleve_choice">Choisir un élève</label>
+                    <select name="eleve_choice" id="eleve_choice">
+                        <option value="" {% if eleve_selectionne == None %}selected{% endif %}>Choisir un élève</option>
+                        {% for eleve in eleve_disponibles %}
+                        <option value="{{ eleve['INE'] }}" {% if eleve==eleve_selectionne %}selected{% endif %}>{{ eleve['nom'] + ' ' + eleve['prenom'] }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <script src="{{url_for('static', filename='on_eleve_change.js')}}"></script>
+                <!-- Selection de paramètres pour le graphique -->
+                <form method="post" id="parametre_form">
+                    <label for="modeles_choice">Choisir un modele</label>
+                    <select name="modeles_choice" id="modeles_choice">
+                        {% for modele in modeles_disponibles %}
+                        <option value="{{ modele.nom }}" {% if modele.nom==modele_selectionne %}selected{% endif %}>{{ modele.nom }} ; corrélation : {{ modele.correlation }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <script src="{{url_for('static', filename='on_parametre_change.js')}}"></script>
+            </section>
         </div>
-    </div>
+    </aside>
 
-    <!-- Tout les éléments qui seront affiché lorsqu'un fichier à été sélectionné comme le choix du modèle, le graphique et la bar de chargement -->
-    <div id="graphique-zone">
-        <h2>Paramètres</h2>
-        <form method="post" id="eleve_form">
-            <label for="eleve_choice">Choisir un élève</label>
-            <select name="eleve_choice" id="eleve_choice">
-                <option value="" {% if eleve_selectionne == None %}selected{% endif %}>Choisir un élève</option>
-                {% for eleve in eleve_disponibles %}
-                <option value="{{ eleve['INE'] }}" {% if eleve==eleve_selectionne %}selected{% endif %}>{{ eleve['nom'] + ' ' + eleve['prenom'] }}</option>
-                {% endfor %}
-            </select>
-        </form>
-        <script src="{{url_for('static', filename='on_eleve_change.js')}}"></script>
-        <!-- Selection de paramètres pour le graphique -->
-        <form method="post" id="parametre_form">
-            <label for="modeles_choice">Choisir un modele</label>
-            <select name="modeles_choice" id="modeles_choice">
-                {% for modele in modeles_disponibles %}
-                <option value="{{ modele.nom }}" {% if modele.nom==modele_selectionne %}selected{% endif %}>{{ modele.nom }} ; corrélation : {{ modele.correlation }}</option>
-                {% endfor %}
-            </select>
-        </form>
-        <script src="{{url_for('static', filename='on_parametre_change.js')}}"></script>
+    <article id="graphique-zone">
+        <!-- Tout les éléments qui seront affiché lorsqu'un fichier à été sélectionné comme le choix du modèle, le graphique et la bar de chargement -->
+        <div id="graphique-zone">
+            {% if eleve_selectionne %}
+            <!-- Zone du graphique -->
+            <div class="chart" id="bargraph"></div>
+            <p id="selected_text"></p>
 
-        {% if eleve_selectionne %}
-        <!-- Zone du graphique -->
-        <div class="chart" id="bargraph"></div>
-        <p id="selected_text"></p>
-
-        <!-- Zone de la bar de chargement -->
-        <div class="progress" id="progress" style="width:50%; margin: 50px;">
-            <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-                <span class="progress-bar-label">0%</span>
+            <!-- Zone de la bar de chargement -->
+            <div class="progress" id="progress" style="width:50%; margin: 50px;">
+                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                    <span class="progress-bar-label">0%</span>
+                </div>
             </div>
-        </div>
 
-        <!-- Script de la zone de chargement-->
-        {% if fichier_charge != "" %}
-        <script src="{{url_for('static', filename='load_graph.js')}}"></script>
-        {% endif %}
-        {% endif %}
-    </div>
+            <!-- Script de la zone de chargement-->
+            {% if fichier_charge != "" %}
+            <script src="{{url_for('static', filename='load_graph.js')}}"></script>
+            {% endif %}
+            {% endif %}
+        </div>
+    </article>
 
     <!-- Affichage de graphique-zone -->
     {% if fichier_charge != "" and (eleve_selectionne != "" or eleve_selectionne != None) %}

@@ -1,7 +1,20 @@
-#inputs {
+body {
     display: flex;
 }
 
-#file-input, #model-input {
+body>aside {
+    width: 40%;
+}
+
+body>article {
+    width: 60%;
+}
+
+/* body>aside, body>article {
     flex: 1;
+} */
+
+#graphique-zone {
+    margin: auto;
+    padding: auto;
 }
