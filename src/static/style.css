@@ -20,3 +20,14 @@ body>article {
     align-items: center;
     gap: 10px;
 }
+
+#modeles {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#parametre_form {
+    display: flex;
+    flex-direction: column;
+}

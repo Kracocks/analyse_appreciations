@@ -80,6 +80,7 @@
             <!-- Sélection d'élève, sélection de modèle et calcul de leurs corrélations -->
             <section>
                 <h2>Paramètres</h2>
+                <!-- Sélection d'un élève -->
                 <form method="post" id="eleve_form">
                     <label for="eleve_choice">Choisir un élève</label>
                     <select name="eleve_choice" id="eleve_choice">
@@ -90,20 +91,23 @@
                     </select>
                 </form>
                 <script src="{{url_for('static', filename='on_eleve_change.js')}}"></script>
-                <!-- Selection de paramètres pour le graphique -->
-                <form method="post" id="parametre_form">
-                    <label for="modeles_choice">Choisir un modele</label>
-                    <select name="modeles_choice" id="modeles_choice">
-                        {% for modele in modeles_disponibles %}
-                        <option value="{{ modele.nom }}" {% if modele.nom==modele_selectionne %}selected{% endif %}>{{ modele.nom }} ; corrélation : {{ modele.correlation }}</option>
-                        {% endfor %}
-                    </select>
-                </form>
-                <script src="{{url_for('static', filename='on_parametre_change.js')}}"></script>
-                <form role="form" method="post" action="{{ url_for('correler_modele') }}">
-                    {{ form.hidden_tag() }}
-                    <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Calculer les corrélations">
-                </form>
+                <!-- Sélection d'un modèle -->
+                <div id="modeles">
+                    <form method="post" id="parametre_form" style="margin: 0;">
+                        <label for="modeles_choice">Choisir un modele</label>
+                        <select name="modeles_choice" id="modeles_choice">
+                            {% for modele in modeles_disponibles %}
+                            <option value="{{ modele.nom }}" {% if modele.nom==modele_selectionne %}selected{% endif %}>{{ modele.nom }} ; corrélation : {{ modele.correlation }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                    <script src="{{url_for('static', filename='on_parametre_change.js')}}"></script>
+                
+                    <form role="form" method="post" action="{{ url_for('correler_modele') }}" style="margin: 0;">
+                        {{ form.hidden_tag() }}
+                        <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Calculer les corrélations">
+                    </form>
+                </div>
             </section>
         </div>
     </aside>
