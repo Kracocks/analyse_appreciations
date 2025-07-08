@@ -596,13 +596,17 @@ class ModeleDB(db.Model):
         Returns:
             float: Le taux de précision.
         """
-        dstrain = load_dataset("eltorio/appreciation", split="train")
+        #dstrain = load_dataset("eltorio/appreciation", split="train")
         dsvalid = load_dataset("eltorio/appreciation", split="validation")
         
-        commentaires = dstrain["commentaire"] + dsvalid["commentaire"]
-        comportements = dstrain["comportement 0-10"] + dsvalid["comportement 0-10"]
-        participations = dstrain["participation 0-10"] + dsvalid["participation 0-10"]
-        travails = dstrain["travail 0-10"] + dsvalid["travail 0-10"]
+        # commentaires = dstrain["commentaire"] + dsvalid["commentaire"]
+        # comportements = dstrain["comportement 0-10"] + dsvalid["comportement 0-10"]
+        # participations = dstrain["participation 0-10"] + dsvalid["participation 0-10"]
+        # travails = dstrain["travail 0-10"] + dsvalid["travail 0-10"]
+        commentaires = dsvalid["commentaire"]
+        comportements = dsvalid["comportement 0-10"]
+        participations = dsvalid["participation 0-10"]
+        travails = dsvalid["travail 0-10"]
 
         scores = self.analyser(commentaires)
 
