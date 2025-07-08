@@ -177,8 +177,10 @@ class Graphique:
                 y=-0.3,
                 xanchor="center",
                 x=0.5,
-                traceorder="normal"
-            )
+                traceorder="normal",
+                itemwidth=30
+            ),
+            height=800
         )
         for nom, valeurs in resultats.items():
             couleur = COULEURS[ind_couleur % len(COULEURS)]
