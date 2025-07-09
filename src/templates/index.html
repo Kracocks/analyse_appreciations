@@ -24,12 +24,12 @@
 
 <body>
     <aside id="inputs">
-        <div id="file-input">
+        <section id="file-input">
             <h2>Importer un fichier</h2>
             <!-- Selection de fichier -->
             <script>
-                dropzone_message = ">>> Glissez-déposez ou cliquez pour sélectionner <<< <br><br>"
-                temp = "{{ fichier_charge | safe }}" != "" ? "Fichier chargé : {{ fichier_charge | safe }}" : ""
+                dropzone_message = "[Glissez-déposez ou cliquez pour sélectionner] <br><br>"
+                temp = ("{{ fichier_charge | safe }}" == "" && "{{ fichier_charge | safe }}" == "None") ? "Fichier chargé : {{ fichier_charge | safe }}" : "Aucun fichier chargé"
                 dropzone_message = dropzone_message + temp
             </script>
 
@@ -44,19 +44,51 @@
             <form method="post" enctype="multipart/form-data" id="recent_file_form">
                 <label for="recent_files_choice">Choisir un fichier récemment utilisé</label>
                 <select name="recent_files_choice" id="recent_files_choice">
-                    <option value="">Aucun fichier choisi</option>
+                    <option value="">Choisir un fichier</option>
                     {% for fichier_recent in fichiers_recents %}
                     <option value="{{ fichier_recent }}">{{ fichier_recent }}</option>
                     {% endfor %}
                 </select>
             </form>
             <script src="{{url_for('static', filename='on_file_selected.js')}}"></script>
-        </div>
+        </section>
 
-        <div id="model-input">
-            <!-- Ajout de modèles -->
-            <section>
-            <h2 class="ajout-modele">Ajouter un modèle</h2>
+        <!-- Sélection d'élève, sélection de modèle et calcul de leurs corrélations -->
+        <section id="parametres">
+            <h2>Paramètres</h2>
+            <!-- Sélection d'un élève -->
+            <form method="post" id="eleve_form">
+                <label for="eleve_choice">Élève : </label>
+                <select name="eleve_choice" id="eleve_choice">
+                    <option value="" {% if eleve_selectionne == None %}selected{% endif %}>Choisir un élève</option>
+                    {% for eleve in eleve_disponibles %}
+                    <option value="{{ eleve['INE'] }}" {% if eleve==eleve_selectionne %}selected{% endif %}>{{ eleve['nom'] + ' ' + eleve['prenom'] }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+            <script src="{{url_for('static', filename='on_eleve_change.js')}}"></script>
+            <!-- Sélection d'un modèle -->
+            <div id="modeles">
+                <form method="post" id="parametre_form" style="margin: 0;">
+                    <label for="modeles_choice">Modèle : </label>
+                    <select name="modeles_choice" id="modeles_choice">
+                        {% for modele in modeles_disponibles %}
+                        <option value="{{ modele.nom }}" {% if modele.nom==modele_selectionne %}selected{% endif %}>{{ modele.nom }} ; corrélation : {{ modele.correlation }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <script src="{{url_for('static', filename='on_parametre_change.js')}}"></script>
+            
+                <form role="form" method="post" action="{{ url_for('correler_modele') }}" style="margin: 0;">
+                    {{ form.hidden_tag() }}
+                    <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Calculer les corrélations">
+                </form>
+            </div>
+        </section>
+
+        <!-- Ajout de modèles -->
+        <section id="autres">
+            <h2 class="ajout-modele">Ajouter un modèle IA</h2>
             <form role="form" method="post" action="{{ url_for('save_modele') }}" id="add_modele_form">
                 {{ form.hidden_tag() }}
                 
@@ -76,40 +108,7 @@
                 </ul>
                 {% endif%}
             </form>
-            </section>
-            <!-- Sélection d'élève, sélection de modèle et calcul de leurs corrélations -->
-            <section>
-                <h2>Paramètres</h2>
-                <!-- Sélection d'un élève -->
-                <form method="post" id="eleve_form">
-                    <label for="eleve_choice">Choisir un élève</label>
-                    <select name="eleve_choice" id="eleve_choice">
-                        <option value="" {% if eleve_selectionne == None %}selected{% endif %}>Choisir un élève</option>
-                        {% for eleve in eleve_disponibles %}
-                        <option value="{{ eleve['INE'] }}" {% if eleve==eleve_selectionne %}selected{% endif %}>{{ eleve['nom'] + ' ' + eleve['prenom'] }}</option>
-                        {% endfor %}
-                    </select>
-                </form>
-                <script src="{{url_for('static', filename='on_eleve_change.js')}}"></script>
-                <!-- Sélection d'un modèle -->
-                <div id="modeles">
-                    <form method="post" id="parametre_form" style="margin: 0;">
-                        <label for="modeles_choice">Choisir un modele</label>
-                        <select name="modeles_choice" id="modeles_choice">
-                            {% for modele in modeles_disponibles %}
-                            <option value="{{ modele.nom }}" {% if modele.nom==modele_selectionne %}selected{% endif %}>{{ modele.nom }} ; corrélation : {{ modele.correlation }}</option>
-                            {% endfor %}
-                        </select>
-                    </form>
-                    <script src="{{url_for('static', filename='on_parametre_change.js')}}"></script>
-                
-                    <form role="form" method="post" action="{{ url_for('correler_modele') }}" style="margin: 0;">
-                        {{ form.hidden_tag() }}
-                        <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Calculer les corrélations">
-                    </form>
-                </div>
-            </section>
-        </div>
+        </section>
     </aside>
 
     <article id="graphique-zone">
