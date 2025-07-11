@@ -69,8 +69,6 @@ class Graphique:
                 trimestres.append(trimestre + " année " + annee_scolaire)
 
                 # Obtenir les moyennes générales
-                self.chargement.status = "Récupération de la moyenne générale du " + trimestre + " de l'année scolaire " + annee_scolaire
-
                 if resultats.get("moyennes générales") == None:
                     resultats["moyennes générales"] = []
                 mg = self.donnees.get_moyenne(annee_scolaire, trimestre)
@@ -79,7 +77,6 @@ class Graphique:
                 self.chargement.update_progression(1 * 80 / nb_total_donnees)
 
                 # Obtenir les appréciations générales
-                self.chargement.status = "Récupération de l'appréciation générale du " + trimestre + " de l'année scolaire " + annee_scolaire
                 appreciation = self.donnees.get_appreciation(annee_scolaire, trimestre)
                 if resultats.get("appréciations générales") == None:
                     resultats["appréciations générales"] = {"textes": [], "scores": []}
@@ -89,7 +86,6 @@ class Graphique:
                 
                 for matiere in matieres:
                     # Obtenir les moyennes de la matière
-                    self.chargement.status = "Récupération de la moyenne de " + matiere + " du " + trimestre + " de l'année scolaire " + annee_scolaire
                     if resultats.get("moyennes " + matiere) == None:
                         resultats["moyennes " + matiere] = []
                     moyenne = self.donnees.get_moyenne(annee_scolaire, trimestre, matiere) if self.donnees.matiere_existe(annee_scolaire, trimestre, matiere) else None
@@ -98,7 +94,6 @@ class Graphique:
                     self.chargement.update_progression(1 * 80 / nb_total_donnees)
 
                     # Obtenir les appréciations de la matière
-                    self.chargement.status = "Récupération de l'appréciation de " + matiere + " du " + trimestre + " de l'année scolaire " + annee_scolaire
                     if resultats.get("appréciations " + matiere) == None:
                         resultats["appréciations " + matiere] = {"textes": [], "scores": []}
                     appreciation = self.donnees.get_appreciation(annee_scolaire, trimestre, matiere) if self.donnees.matiere_existe(annee_scolaire, trimestre, matiere) else None

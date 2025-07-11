@@ -1,5 +1,6 @@
 var graphique = document.getElementById("bargraph");
-var progress = document.getElementById("progress");
+var progress = document.getElementById("progress-container");
+var progress_status = document.getElementById("progress-bar-status");
 
 // Lecteur d'évenement pour mettre a jour la barre de chargement
 var source = new EventSource("/progress");
@@ -12,8 +13,10 @@ source.onmessage = function(event) {
     console.log(event)
     $('.progress-bar').css('width', data.progression+'%').attr('aria-valuenow', data.progression);
     $('.progress-bar-label').text(data.progression+'%');
+    progress_status.textContent = data.statut;
 
     console.log(data.progression)
+    console.log(data.statut)
 
     if(data.progression == 100){
         graphique.style.display = "block";
@@ -29,7 +32,7 @@ fetch('/get-graph')
     var graphs = JSON.parse(data.graph);
 
     var graphique_div = document.getElementById("bargraph");
-    var progress_div = document.getElementById("progress");
+    var progress_div = document.getElementById("progress-container");
     if (graphique_div.style.display == "none") {
         graphique_div.style.display = "block";
         progress_div.style.display = "none";

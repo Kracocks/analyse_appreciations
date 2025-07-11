@@ -120,11 +120,21 @@
             <p id="selected_text"></p>
 
             <!-- Zone de la bar de chargement -->
-            <div class="progress" id="progress" style="width:50%; margin: 50px;">
+            <!-- <div class="progress" id="progress" style="width:50%; margin: 50px;">
                 <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
                     <span class="progress-bar-label">0%</span>
                 </div>
+            </div> -->
+            <div class="progress-container" id="progress-container" style="width:50%; margin: 50px;">
+                <div class="progress" id="progress">
+                    <div class="progress-bar progress-bar-striped active" role="progressbar"
+                         aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                        <span class="progress-bar-label">0%</span>
+                    </div>
+                </div>
+                <p id="progress-bar-status">Chargement</p>
             </div>
+            
 
             <!-- Script de la zone de chargement-->
             {% if fichier_charge != "" %}

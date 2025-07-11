@@ -1,10 +1,11 @@
 from .app import app, db, modeles_disponibles
 from .models import Graphique, ModeleForm, ModeleDB, get_last_modele_id, get_modeles, get_modele_from_nom
-from flask import render_template,redirect, url_for, Response, request
+from flask import render_template,redirect, url_for, Response, request, stream_with_context
 from transformers import pipeline
 import os
 from werkzeug.utils import secure_filename
 import json
+import time
 
 graphique = Graphique()
 
@@ -55,12 +56,20 @@ def index():
 @app.route('/progress') # Mettre a jour la bar de progression
 def progress():
     def generate():
-        progression = graphique.chargement.progression
-        statut = graphique.chargement.status
-        data = json.dumps({"progression": progression, "statut":statut})
-        yield "data:" + str(data) + "\n\n"
+        while True:
+            progression = graphique.chargement.progression
+            statut = graphique.chargement.status
 
-    return Response(generate(), mimetype='text/event-stream')
+            data = json.dumps({"progression": progression, "statut": statut})
+            yield f"data: {data}\n\n"
+
+            if progression >= 100:
+                break
+
+            time.sleep(0.2)  # attend 0.5s avant le prochain envoi
+
+    return Response(stream_with_context(generate()), mimetype='text/event-stream')
+
 
 @app.route("/get-graph") # Permetre de récupérer le graphique
 def get_graph():
