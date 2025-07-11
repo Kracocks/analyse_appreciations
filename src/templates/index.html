@@ -29,9 +29,6 @@
             <!-- Selection de fichier -->
             <script>
                 dropzone_message = "[Glissez-déposez ou cliquez pour sélectionner] <br><br>"
-                console.log("{{ fichier_charge | safe }}")
-                console.log("{{ fichier_charge | safe }}" == "")
-
                 temp = ("{{ fichier_charge | safe }}" != "" && "{{ fichier_charge | safe }}" != "None") ? "Fichier chargé : {{ fichier_charge | safe }}" : "Aucun fichier chargé"
                 dropzone_message = dropzone_message + temp
             </script>

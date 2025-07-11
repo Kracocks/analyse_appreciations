@@ -30,7 +30,7 @@ def finetune():
     for modele in ["Peed911/french_sentiment_analysis", "ac0hik/Sentiment_Analysis_French"]:
 
         tokenizer = AutoTokenizer.from_pretrained(modele)
-        model = AutoModelForSequenceClassification.from_pretrained(modele)
+        model = AutoModelForSequenceClassification.from_pretrained(modele) # --> parametre pour tache de regression
 
         def labeliser(exemple):
             comportement = exemple["comportement 0-10"]

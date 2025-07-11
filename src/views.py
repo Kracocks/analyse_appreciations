@@ -9,11 +9,6 @@ import json
 graphique = Graphique()
 
 with app.app_context():
-    from .models import get_modeles
-    for modele in get_modeles():
-        modele.pipeline = pipeline("text-classification", model=modele.nom, top_k=None) 
-        modeles_disponibles.append(modele)
-    
     graphique.modifier_modele("Peed911/french_sentiment_analysis")
 
 @app.route("/", methods=["GET", "POST"])
@@ -24,9 +19,6 @@ def index():
     modele_selectionne = graphique.modele_choisi.nom if graphique.modele_choisi.nom != None else modeles_disponibles[0].nom
 
     if request.method == 'POST':
-        
-        test = request.form
-
         file = request.files.get('file')
 
         if file:

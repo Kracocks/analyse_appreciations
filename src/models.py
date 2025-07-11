@@ -37,19 +37,27 @@ class Graphique:
             modele (str): Le nouveau modèle d'IA
         """
         self.modele_choisi = get_modele_from_nom(modele)
+        
 
     def generer(self) -> str:
         """Génère un graphique à partir des données, variables et modèle d'IA
 
         Returns:
             str: Le graphique généré
-        """   
-        # Récupération des données
-        self.chargement.to_start()
-        self.chargement.status = "Récupération des données"
-
+        """
         start_time = time.time()
 
+        # Récupération des données
+        self.chargement.to_start()
+        
+        # Chargement du modèle si pas chargé
+        self.chargement.status = "Chargement du modèle d'IA choisi"
+        if self.modele_choisi.pipeline == None:
+            self.modele_choisi.pipeline = pipeline("text-classification", model=self.modele_choisi.nom, top_k=None) 
+        self.chargement.update_progression(5)
+
+        self.chargement.status = "Récupération des données"
+        
         nb_total_donnees = self.donnees.get_nb_total_donnees()
         print("Nombre d'elements : ", nb_total_donnees)
         annees_scolaire = self.donnees.get_annees_scolaire()
