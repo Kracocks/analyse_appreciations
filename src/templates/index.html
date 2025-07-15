@@ -29,8 +29,11 @@
             <!-- Selection de fichier -->
             <script>
                 dropzone_message = "[Glissez-déposez ou cliquez pour sélectionner] <br><br>"
-                temp = ("{{ fichier_charge | safe }}" != "" && "{{ fichier_charge | safe }}" != "None") ? "Fichier chargé : {{ fichier_charge | safe }}" : "Aucun fichier chargé"
+                is_fichier_charge = "{{ fichier_charge | safe }}" != "" && "{{ fichier_charge | safe }}" != "None"
+                temp = is_fichier_charge ? "Fichier chargé : {{ fichier_charge | safe }}" : "Aucun fichier chargé"
                 dropzone_message = dropzone_message + temp
+
+                console.log(is_fichier_charge)
             </script>
 
             <!-- affichage de la dropzone-->
@@ -44,9 +47,11 @@
             <form method="post" enctype="multipart/form-data" id="recent_file_form">
                 <label for="recent_files_choice">Choisir un fichier récemment utilisé</label>
                 <select name="recent_files_choice" id="recent_files_choice">
-                    <option value="">Choisir un fichier</option>
+                    {% if fichier_charge == "" or fichier_charge == None %}
+                    <option value="" selected>Choisir un fichier</option>
+                    {% endif %}
                     {% for fichier_recent in fichiers_recents %}
-                    <option value="{{ fichier_recent }}">{{ fichier_recent }}</option>
+                    <option value="{{ fichier_recent }}" {% if fichier_recent == fichier_charge %}selected{% endif %}>{{ fichier_recent }}</option>
                     {% endfor %}
                 </select>
             </form>
