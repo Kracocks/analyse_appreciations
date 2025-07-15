@@ -94,6 +94,7 @@ def save_modele():
 
 @app.route("/edit/correlation/", methods=["POST"])
 def correler_modele():
+    modeles_disponibles = get_modeles()
     for i in range(len(modeles_disponibles)):
         if modeles_disponibles[i].correlation == None:
             correlation = modeles_disponibles[i].noter()

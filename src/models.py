@@ -588,7 +588,7 @@ class ModeleDB(db.Model):
         scores = self.pipeline(textes)
         for score in scores:
             for score in score:
-                if score["label"].upper() == "POSITIVE":
+                if score["label"].upper() == "POSITIVE" or score["label"].upper() == "LABEL_0" :
                     res.append(round(score["score"] * 20, 2))
         return res
 

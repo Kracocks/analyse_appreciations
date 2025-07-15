@@ -30,36 +30,18 @@ def finetune():
     for modele in ["Peed911/french_sentiment_analysis", "ac0hik/Sentiment_Analysis_French"]:
 
         tokenizer = AutoTokenizer.from_pretrained(modele)
-        model = AutoModelForSequenceClassification.from_pretrained(modele) # --> parametre pour tache de regression
+        model = AutoModelForSequenceClassification.from_pretrained(modele, problem_type="regression", num_labels=1, ignore_mismatched_sizes=True) # --> parametre pour tache de regression
 
-        def labeliser(exemple):
-            comportement = exemple["comportement 0-10"]
-            participation = exemple["participation 0-10"]
-            travail = exemple["travail 0-10"]
+        def labeliser(dataset):
+            comportement = dataset["comportement 0-10"]
+            participation = dataset["participation 0-10"]
+            travail = dataset["travail 0-10"]
             note = comportement + participation + travail
+            score = note / 30
+            
+            dataset["label"] = score
 
-            if model.config.num_labels == 2:
-                label2id = {"negatif": 0, "positif": 1}
-
-                if note > 15:
-                    exemple["label"] = label2id["positif"]
-                else:
-                    exemple["label"] = label2id["negatif"]
-
-            elif model.config.num_labels == 3:
-                label2id = {"negatif": 0, "neutre": 1, "positif": 2}
-
-                if note >= 20:
-                    exemple["label"] = label2id["positif"]
-                elif note >= 10:
-                    exemple["label"] = label2id["neutre"]
-                else:
-                    exemple["label"] = label2id["negatif"]
-
-            else:
-                raise("Pas prévu pour un modèle avec " + model.config.num_labels + " labels")
-
-            return exemple
+            return dataset
 
         appreciations = appreciations.map(labeliser)
 
@@ -76,11 +58,11 @@ def finetune():
 
         training_args = TrainingArguments(
             output_dir=output_dir,
-            learning_rate=2e-5,
+            learning_rate=2e-4,
             per_device_train_batch_size=16,
             per_device_eval_batch_size=16,
             num_train_epochs=5,
-            weight_decay=0.01,
+            weight_decay=0.1,
         )
 
         trainer = Trainer(
