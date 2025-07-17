@@ -174,6 +174,9 @@ class Graphique:
         ind_couleur = 0
         data = go.Figure(layout_yaxis_range=[0,20])
         data.update_layout(
+            title=dict(
+                text="Progression scolaire de " + self.donnees.get_nom_eleve()
+            ),
             legend=dict(
                 orientation="h",
                 yanchor="top",
@@ -383,6 +386,9 @@ class Donnees:
             for eleve in self.donnees:
                 res.append({"nom": eleve["nom"], "prenom": eleve["prenom"], "INE": eleve["INE"]})
         return res
+    
+    def get_nom_eleve(self):
+        return (self.donnees_eleve.get("prenom") + " " + self.donnees_eleve.get("nom"))
 
     def get_annees_scolaire(self) -> list[str]:
         """Permet d'avoir toute les années scolaire enregistré dans le fichier
