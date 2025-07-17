@@ -11,6 +11,7 @@ import textwrap
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, StringField
 from wtforms.validators import DataRequired, ValidationError
+from constantes import COULEURS, MOT_MOYENNES, MOT_APPRECIATIONS
 
 class Graphique:
     def __init__(self):
@@ -86,18 +87,18 @@ class Graphique:
                 
                 for matiere in matieres:
                     # Obtenir les moyennes de la matière
-                    if resultats.get("moyennes " + matiere) == None:
-                        resultats["moyennes " + matiere] = []
+                    if resultats.get(MOT_MOYENNES + matiere) == None:
+                        resultats[MOT_MOYENNES + matiere] = []
                     moyenne = self.donnees.get_moyenne(annee_scolaire, trimestre, matiere) if self.donnees.matiere_existe(annee_scolaire, trimestre, matiere) else None
-                    resultats["moyennes " + matiere].append(moyenne)
+                    resultats[MOT_MOYENNES + matiere].append(moyenne)
                     
                     self.chargement.update_progression(1 * 80 / nb_total_donnees)
 
                     # Obtenir les appréciations de la matière
-                    if resultats.get("appréciations " + matiere) == None:
-                        resultats["appréciations " + matiere] = {"textes": [], "scores": []}
+                    if resultats.get(MOT_APPRECIATIONS + matiere) == None:
+                        resultats[MOT_APPRECIATIONS + matiere] = {"textes": [], "scores": []}
                     appreciation = self.donnees.get_appreciation(annee_scolaire, trimestre, matiere) if self.donnees.matiere_existe(annee_scolaire, trimestre, matiere) else None
-                    resultats["appréciations " + matiere]["textes"].append(appreciation)
+                    resultats[MOT_APPRECIATIONS + matiere]["textes"].append(appreciation)
                     
                     self.chargement.update_progression(1 * 80 / nb_total_donnees)
 
@@ -105,8 +106,8 @@ class Graphique:
 
         # Récupération des scores
         for resultat in resultats.keys():
-            if resultat.startswith("appréciations "):
-                nom = resultat[len("appréciations "):]
+            if resultat.startswith(MOT_APPRECIATIONS):
+                nom = resultat[len(MOT_APPRECIATIONS):]
 
                 # On récupère les textes pour les analyser et les mettres dans scores
                 vals_existes = [] # Les valeurs qui ne sont pas à None
@@ -134,43 +135,6 @@ class Graphique:
         # Création du graphique
         self.chargement.status = "Création du graphique"
 
-        COULEURS = [
-            "#1f77b4",
-            "#ff7f0e",
-            "#2ca02c",
-            "#d62728",
-            "#9467bd",
-            "#8c564b",
-            "#e377c2",
-            "#7f7f7f",
-            "#bcbd22",
-            "#17becf",
-            "#393b79",
-            "#637939",
-            "#8c6d31",
-            "#843c39",
-            "#7b4173",
-            "#5254a3",
-            "#9c9ede",
-            "#cedb9c",
-            "#bd9e39",
-            "#e7969c",
-            "#de9ed6",
-            "#6b6ecf",
-            "#b5cf6b",
-            "#ad494a",
-            "#a55194",
-            "#393b79",
-            "#8ca252",
-            "#bd9e39",
-            "#d6616b",
-            "#e7ba52",
-            "#ce6dbd",
-            "#6b486b",
-            "#a05d56",
-            "#d0743c",
-            "#ff8c00",
-        ]
         ind_couleur = 0
         data = go.Figure(layout_yaxis_range=[0,20])
         data.update_layout(
@@ -188,6 +152,7 @@ class Graphique:
             ),
             height=800
         )
+
         for nom, valeurs in resultats.items():
             couleur = COULEURS[ind_couleur % len(COULEURS)]
             ind_couleur += 1
@@ -234,7 +199,7 @@ class Graphique:
                                             ))
 
                 case _:
-                    if nom.startswith("moyennes "):
+                    if nom.startswith(MOT_MOYENNES):
                         data.add_trace(go.Scatter(x=trimestres, y=valeurs,
                                                   mode="lines",
                                                   name=nom + " (donnée(s) manquante(s))",
@@ -256,7 +221,7 @@ class Graphique:
                                                   line=dict(color=couleur)
                                                 ))
 
-                    elif nom.startswith("appréciations "):
+                    elif nom.startswith(MOT_APPRECIATIONS):
                         data.add_trace(go.Scatter(x=trimestres, y=valeurs["scores"],
                                                   mode="lines",
                                                   name=nom + " (donnée(s) manquante(s))",
