@@ -11,7 +11,7 @@ import textwrap
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, StringField
 from wtforms.validators import DataRequired, ValidationError
-from constantes import COULEURS, MOT_MOYENNES, MOT_APPRECIATIONS
+from .constantes import COULEURS, MOT_MOYENNES, MOT_APPRECIATIONS
 
 class Graphique:
     def __init__(self):
