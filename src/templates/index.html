@@ -101,7 +101,6 @@
                     {{ form.nom.label }}
                     <div>
                         {{ form.nom(size=50, class_="form-control") }}
-                        <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Ajouter">
                     </div>
                 </div>
 
@@ -112,6 +111,24 @@
                     {% endfor%}
                 </ul>
                 {% endif%}
+
+                <div class={% if form.label_positif.errors %}"form-group has-error"{% else %}"form-group"{% endif %}>
+                    {{ form.label_positif.label }}
+                    <div>
+                        {{ form.label_positif(size=50, class_="form-control") }}
+                    </div>
+                </div>
+
+                {% if form.label_positif.errors%}
+                <ul class="list-group">
+                    {% for e in form.label_positif.errors%}
+                    <li class="list-group-item list-group-item-danger">{{e}}</li>
+                    {% endfor%}
+                </ul>
+                {% endif%}
+
+                <input class="btn btn-success rounded-pill btn-enreg" type="submit" value="Ajouter">
+
             </form>
         </section>
     </aside>

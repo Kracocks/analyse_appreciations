@@ -7,10 +7,10 @@ def loaddb():
 
     db.create_all()
 
-    modele = ModeleDB(nom = "Peed911/french_sentiment_analysis")
+    modele = ModeleDB(nom = "Peed911/french_sentiment_analysis", label_positif = "Positive")
     db.session.add(modele)
 
-    modele = ModeleDB(nom = "ac0hik/Sentiment_Analysis_French")
+    modele = ModeleDB(nom = "ac0hik/Sentiment_Analysis_French", label_positif = "positive")
     db.session.add(modele)
 
     db.session.commit()

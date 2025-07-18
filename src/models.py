@@ -538,10 +538,11 @@ class ModeleDB(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     nom = db.Column(db.String, nullable=False)
     correlation = db.Column(db.Float)
+    label_positif = db.Column(db.String, nullable=False)
     pipeline = None
     
     def __repr__(self):
-        return f"<Modele {self.id, self.nom, self.correlation}>"
+        return f"<Modele {self.id, self.nom, self.correlation, self.label_positif}>"
     
     def analyser(self, textes:list[str]) ->list[float]:
         """Analyse et donne un score /20 à un texte à partir du modele d'IA sélectionné
@@ -559,7 +560,7 @@ class ModeleDB(db.Model):
         scores = self.pipeline(textes)
         for score in scores:
             for score in score:
-                if score["label"].upper() == "POSITIVE" or score["label"].upper() == "LABEL_0" :
+                if score["label"].upper() == self.label_positif.upper():
                     res.append(round(score["score"] * 20, 2))
         return res
 
@@ -599,13 +600,18 @@ class ModeleDB(db.Model):
 
 # Validators
 def valider_nom_modele(form, field):
+    print(form)
     if not repo_exists(field.data):
         raise ValidationError("Ce modèle n'existe pas sur HuggingFace")
+
+def valider_label_positif_modele(form, field):
+    print(form)
 
 # Formulaires
 class ModeleForm(FlaskForm):
     id = HiddenField("id")
     nom = StringField("Nom du modèle provenant de HuggingFace", validators=[DataRequired(), valider_nom_modele])
+    label_positif = StringField("Nom du label positif du modèle", validators=[DataRequired(), valider_label_positif_modele])
 
 def get_modeles():
     return ModeleDB.query.all()

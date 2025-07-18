@@ -6,11 +6,13 @@ import os
 from werkzeug.utils import secure_filename
 import json
 import time
+import sys
 
 graphique = Graphique()
 
 with app.app_context():
-    graphique.modifier_modele("Peed911/french_sentiment_analysis")
+    if sys.argv[1] == "run":
+        graphique.modifier_modele("Peed911/french_sentiment_analysis")
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -84,7 +86,7 @@ def save_modele():
     f = ModeleForm()
     if f.validate_on_submit():
         id = get_last_modele_id() + 1
-        modele = ModeleDB(id=id, nom=f.nom.data, correlation=None)
+        modele = ModeleDB(id=id, nom=f.nom.data, correlation=None, label_positif=f.label_positif.data)
         modele.pipeline = pipeline("text-classification", model="ac0hik/Sentiment_Analysis_French", top_k=None)
         db.session.add(modele)
         db.session.commit()
