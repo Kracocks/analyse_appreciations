@@ -19,6 +19,7 @@ def index():
     fichiers_recents = [f for f in os.listdir(app.config["UPLOAD_PATH"]) if os.path.isfile(os.path.join(app.config["UPLOAD_PATH"], f))]
     filename = graphique.donnees.fichier
     modeles_disponibles = get_modeles()
+    print(modeles_disponibles)
     modele_selectionne = graphique.modele_choisi.nom if graphique.modele_choisi.nom != None else modeles_disponibles[0].nom
 
     if request.method == 'POST':
@@ -28,20 +29,6 @@ def index():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config["UPLOAD_PATH"], filename))
             graphique.modifier_donnees(os.path.join(app.config["UPLOAD_PATH"], filename))
-
-        # Selection d'un fichier récemment utilisé
-        elif request.form.get("recent_files_choice"):
-            filename = request.form.get("recent_files_choice")
-            graphique.modifier_donnees(os.path.join(app.config["UPLOAD_PATH"], filename))
-
-        # Réafficher le tableau
-        if request.form.get("modeles_choice"):
-            modele_selectionne = request.form.get("modeles_choice")
-            graphique.modifier_modele(modele_selectionne)
-
-        if request.form.get("eleve_choice") != None:
-            ine_eleve = request.form.get("eleve_choice")
-            graphique.donnees.modifier_eleve(ine_eleve)
 
     f=ModeleForm()
 
@@ -72,7 +59,6 @@ def progress():
 
     return Response(stream_with_context(generate()), mimetype='text/event-stream')
 
-
 @app.route("/get-graph") # Permetre de récupérer le graphique
 def get_graph():
     graph = ""
@@ -91,7 +77,37 @@ def save_modele():
         db.session.add(modele)
         db.session.commit()
 
-        modeles_disponibles.append(modele)
+        return redirect(url_for("index"))
+    fichiers_recents = [f for f in os.listdir(app.config["UPLOAD_PATH"]) if os.path.isfile(os.path.join(app.config["UPLOAD_PATH"], f))]
+    filename = graphique.donnees.fichier
+    modeles_disponibles = get_modeles()
+    modele_selectionne = graphique.modele_choisi.nom if graphique.modele_choisi.nom != None else modeles_disponibles[0].nom
+    return render_template("index.html",
+                           fichier_charge=filename,
+                           modeles_disponibles=modeles_disponibles,
+                           fichiers_recents=fichiers_recents,
+                           modele_selectionne=modele_selectionne,
+                           notes_ia=graphique.modele_choisi.correlation,
+                           eleve_disponibles=graphique.donnees.get_eleves(),
+                           eleve_selectionne=graphique.donnees.eleve_selectionne,
+                           form=f)
+    
+@app.route("/edit/file/", methods=["POST"])
+def modifier_fichier():
+    filename = request.form.get("recent_files_choice")
+    graphique.modifier_donnees(os.path.join(app.config["UPLOAD_PATH"], filename))
+    return redirect(url_for("index"))
+
+@app.route("/edit/modele/", methods=["POST"])
+def modifier_modele_choisi():
+    modele_selectionne = request.form.get("modeles_choice")
+    graphique.modifier_modele(modele_selectionne)
+    return redirect(url_for("index"))
+
+@app.route("/edit/eleve/", methods=["POST"])
+def modifier_eleve():
+    ine_eleve = request.form.get("eleve_choice")
+    graphique.donnees.modifier_eleve(ine_eleve)
     return redirect(url_for("index"))
 
 @app.route("/edit/correlation/", methods=["POST"])

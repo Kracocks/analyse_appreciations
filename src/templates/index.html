@@ -44,7 +44,7 @@
                                 dictDefaultMessage: dropzone_message') }}
 
             <!-- Selection de fichier récent -->
-            <form method="post" enctype="multipart/form-data" id="recent_file_form">
+            <form method="post" enctype="multipart/form-data" action="{{ url_for('modifier_fichier') }}" id="recent_file_form">
                 <label for="recent_files_choice">Choisir un fichier récemment utilisé</label>
                 <select name="recent_files_choice" id="recent_files_choice">
                     {% if fichier_charge == "" or fichier_charge == None %}
@@ -62,7 +62,7 @@
         <section id="parametres">
             <h2>Paramètres</h2>
             <!-- Sélection d'un élève -->
-            <form method="post" id="eleve_form">
+            <form method="post" id="eleve_form" action="{{ url_for('modifier_eleve') }}">
                 <label for="eleve_choice">Élève : </label>
                 <select name="eleve_choice" id="eleve_choice">
                     <option value="" {% if eleve_selectionne == None %}selected{% endif %}>Choisir un élève</option>
@@ -74,7 +74,7 @@
             <script src="{{url_for('static', filename='on_eleve_change.js')}}"></script>
             <!-- Sélection d'un modèle -->
             <div id="modeles">
-                <form method="post" id="parametre_form" style="margin: 0;">
+                <form method="post" id="parametre_form" action="{{ url_for('modifier_modele_choisi') }}" style="margin: 0;">
                     <label for="modeles_choice">Modèle : </label>
                     <select name="modeles_choice" id="modeles_choice">
                         {% for modele in modeles_disponibles %}
