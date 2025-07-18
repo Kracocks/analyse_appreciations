@@ -599,18 +599,19 @@ class ModeleDB(db.Model):
         return round(float(x.corr(y)), 2)
 
 # Validators
-def valider_nom_modele(form, field):
-    print(form)
-    if not repo_exists(field.data):
-        raise ValidationError("Ce modèle n'existe pas sur HuggingFace")
-
 def valider_label_positif_modele(form, field):
-    print(form)
+    if repo_exists(form.nom.data):
+        from transformers import AutoModelForSequenceClassification
+        modele = AutoModelForSequenceClassification.from_pretrained(form.nom.data)
+        if field.data.upper() not in modele.config.label2id.keys():
+            raise ValidationError("Ce label n'existe pas parmi les labels du modèle")
+    else:
+        raise ValidationError("Ce modèle n'existe pas sur HuggingFace.")
 
 # Formulaires
 class ModeleForm(FlaskForm):
     id = HiddenField("id")
-    nom = StringField("Nom du modèle provenant de HuggingFace", validators=[DataRequired(), valider_nom_modele])
+    nom = StringField("Nom du modèle provenant de HuggingFace", validators=[DataRequired()])
     label_positif = StringField("Nom du label positif du modèle", validators=[DataRequired(), valider_label_positif_modele])
 
 def get_modeles():
