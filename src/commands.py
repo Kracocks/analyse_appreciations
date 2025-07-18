@@ -26,59 +26,59 @@ def finetune():
     from datasets import load_dataset
     from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer, DataCollatorWithPadding, AutoTokenizer
     appreciations = load_dataset("eltorio/appreciation")
+    
+    nom_model = "Peed911/french_sentiment_analysis"
 
-    for modele in ["Peed911/french_sentiment_analysis", "ac0hik/Sentiment_Analysis_French"]:
+    tokenizer = AutoTokenizer.from_pretrained(nom_model)
+    model = AutoModelForSequenceClassification.from_pretrained(nom_model, problem_type="regression", num_labels=1, ignore_mismatched_sizes=True) # --> parametre pour tache de regression
 
-        tokenizer = AutoTokenizer.from_pretrained(modele)
-        model = AutoModelForSequenceClassification.from_pretrained(modele, problem_type="regression", num_labels=1, ignore_mismatched_sizes=True) # --> parametre pour tache de regression
+    def labeliser(dataset):
+        comportement = dataset["comportement 0-10"]
+        participation = dataset["participation 0-10"]
+        travail = dataset["travail 0-10"]
+        note = comportement + participation + travail
+        score = note / 30
+        
+        dataset["label"] = score
 
-        def labeliser(dataset):
-            comportement = dataset["comportement 0-10"]
-            participation = dataset["participation 0-10"]
-            travail = dataset["travail 0-10"]
-            note = comportement + participation + travail
-            score = note / 30
-            
-            dataset["label"] = score
+        return dataset
 
-            return dataset
+    appreciations = appreciations.map(labeliser)
 
-        appreciations = appreciations.map(labeliser)
+    def preprocess_function(examples):
+        tokenized = tokenizer(examples["commentaire"], truncation=True)
+        tokenized["labels"] = examples["label"]
+        return tokenized
 
-        def preprocess_function(examples):
-            tokenized = tokenizer(examples["commentaire"], truncation=True)
-            tokenized["labels"] = examples["label"]
-            return tokenized
+    tokenized_appreciations = appreciations.map(preprocess_function, batched=True)
 
-        tokenized_appreciations = appreciations.map(preprocess_function, batched=True)
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
-        data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+    output_dir = "./finetune/" + nom_model
 
-        output_dir = "./finetune/" + modele
+    training_args = TrainingArguments(
+        output_dir=output_dir,
+        learning_rate=2e-4,
+        per_device_train_batch_size=16,
+        per_device_eval_batch_size=16,
+        num_train_epochs=5,
+        weight_decay=0.1,
+    )
 
-        training_args = TrainingArguments(
-            output_dir=output_dir,
-            learning_rate=2e-4,
-            per_device_train_batch_size=16,
-            per_device_eval_batch_size=16,
-            num_train_epochs=5,
-            weight_decay=0.1,
-        )
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=tokenized_appreciations["train"],
+        eval_dataset=tokenized_appreciations["validation"],
+        tokenizer=tokenizer,
+        data_collator=data_collator,
+    )
 
-        trainer = Trainer(
-            model=model,
-            args=training_args,
-            train_dataset=tokenized_appreciations["train"],
-            eval_dataset=tokenized_appreciations["validation"],
-            tokenizer=tokenizer,
-            data_collator=data_collator,
-        )
+    trainer.train()
 
-        trainer.train()
+    trainer.save_model(output_dir)
+    tokenizer.save_pretrained(output_dir)
 
-        trainer.save_model(output_dir)
-        tokenizer.save_pretrained(output_dir)
-
-        db.session.add(ModeleDB(nom = output_dir))
+    db.session.add(ModeleDB(nom = output_dir))
 
     db.session.commit()
