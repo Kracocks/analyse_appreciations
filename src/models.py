@@ -447,22 +447,6 @@ class Donnees:
         """
         return matiere in self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"].keys()
 
-    def get_score_appreciation(self, annee_scolaire:str, trimestre:str, modele_ia:str, matiere:str = None) -> float:
-        """Permet d'obtenir le score d'une appreciation à partir de l'année scolaire et du trimestre sélectionné. Si aucune matière n'est sélectionné, on choisi le score de l'appréciation générale sinon on choisi le score de l'appréciation de la matière choisi
-
-        Args:
-            annee_scolaire (str): L'année scolaire choisi
-            trimestre (str): Le trimestre de l'année scolaire choisi
-            modele_ia (str): Le modèle d'ia à utiliser
-            matiere (str, optional): La matière sélectionné. Si aucune, prendre l'appréciation générale. none par défault.
-
-        Returns:
-            float: Le score stocké dans le JSON
-        """
-        if matiere:
-            return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["appreciation_score_" + modele_ia]
-        return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["appreciation_generale_score_" + modele_ia]
-
     def score_existe(self, annee_scolaire:str, trimestre:str, modele_ia:str, matiere:str = None) -> bool:
         """Permet de savoir si le score d'une appréciation à déjà été calculé
 
