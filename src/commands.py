@@ -79,6 +79,6 @@ def finetune():
     trainer.save_model(output_dir)
     tokenizer.save_pretrained(output_dir)
 
-    db.session.add(ModeleDB(nom = output_dir))
+    db.session.add(ModeleDB(nom = output_dir, label_positif = "LABEL_0"))
 
     db.session.commit()
