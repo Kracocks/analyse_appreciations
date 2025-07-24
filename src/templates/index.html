@@ -172,7 +172,7 @@
         var text_info = document.getElementById("informations");
         var graphique_zone = document.getElementById("graphique");
     </script>
-    {% if fichier_charge == "" %}
+    {% if fichier_charge == "" or fichier_charge == None %}
     <script>
         text_info.textContent = "Aucun fichier chargé"
         graphique_zone.style.display = "none"
