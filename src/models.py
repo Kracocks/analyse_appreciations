@@ -17,8 +17,6 @@ class Graphique:
     def __init__(self):
         """Le contructeur de la classe Graphique
         """
-        self.nom = ""
-        self.variables = ["moyennes générales", "appréciations générales"]
         self.donnees = Donnees()
         self.modele_choisi = ModeleDB()
         self.chargement = Chargement()
@@ -60,7 +58,7 @@ class Graphique:
         self.chargement.status = "Récupération des données"
         
         nb_total_donnees = self.donnees.get_nb_total_donnees()
-        print("Nombre d'elements : ", nb_total_donnees)
+
         annees_scolaire = self.donnees.get_annees_scolaire()
         matieres = self.donnees.get_all_matieres()
         trimestres = []
@@ -74,7 +72,6 @@ class Graphique:
                     resultats["moyennes générales"] = []
                 mg = self.donnees.get_moyenne(annee_scolaire, trimestre)
                 resultats["moyennes générales"].append(mg)
-
                 self.chargement.update_progression(1 * 80 / nb_total_donnees)
 
                 # Obtenir les appréciations générales
@@ -82,9 +79,8 @@ class Graphique:
                 if resultats.get("appréciations générales") == None:
                     resultats["appréciations générales"] = {"textes": [], "scores": []}
                 resultats["appréciations générales"]["textes"].append(appreciation)
-
                 self.chargement.update_progression(1 * 80 / nb_total_donnees)
-                
+
                 for matiere in matieres:
                     # Obtenir les moyennes de la matière
                     if resultats.get(MOT_MOYENNES + matiere) == None:
@@ -101,6 +97,27 @@ class Graphique:
                     resultats[MOT_APPRECIATIONS + matiere]["textes"].append(appreciation)
                     
                     self.chargement.update_progression(1 * 80 / nb_total_donnees)
+
+                # Obtenir les retards
+                retard = self.donnees.get_nb_retards(annee_scolaire, trimestre)
+                if resultats.get("retard") == None:
+                    resultats["retard"] = []
+                resultats["retard"].append(retard)
+                self.chargement.update_progression(1 * 80 / nb_total_donnees)
+
+                # Obtenir les absences justifiées
+                absence_just = self.donnees.get_nb_absences_justifie(annee_scolaire, trimestre)
+                if resultats.get("absences justifiées") == None:
+                    resultats["absences justifiées"] = []
+                resultats["absences justifiées"].append(absence_just)
+                self.chargement.update_progression(1 * 80 / nb_total_donnees)
+
+                # Obtenir les absences non justifiées
+                absence_non_just = self.donnees.get_nb_absences_non_justifie(annee_scolaire, trimestre)
+                if resultats.get("absences non justifiées") == None:
+                    resultats["absences non justifiées"] = []
+                resultats["absences non justifiées"].append(absence_non_just)
+                self.chargement.update_progression(1 * 80 / nb_total_donnees)
 
                 print(self.chargement.progression)
 
@@ -135,7 +152,6 @@ class Graphique:
         # Création du graphique
         self.chargement.status = "Création du graphique"
 
-        ind_couleur = 0
         data = go.Figure(layout_yaxis_range=[0,20])
         data.update_layout(
             title=dict(
@@ -153,6 +169,7 @@ class Graphique:
             height=800
         )
 
+        ind_couleur = 0
         for nom, valeurs in resultats.items():
             couleur = COULEURS[ind_couleur % len(COULEURS)]
             ind_couleur += 1
@@ -199,7 +216,7 @@ class Graphique:
                                             ))
 
                 case _:
-                    if nom.startswith(MOT_MOYENNES):
+                    if nom.startswith(MOT_MOYENNES) or nom == "retard" or nom == "absences justifiées" or nom == "absences non justifiées":
                         data.add_trace(go.Scatter(x=trimestres, y=valeurs,
                                                   mode="lines",
                                                   name=nom + " (donnée(s) manquante(s))",
@@ -433,6 +450,15 @@ class Donnees:
             for trimestre in self.get_trimestres(annee_scolaire):
                 res.update(self.get_matieres(annee_scolaire, trimestre))
         return res
+
+    def get_nb_absences_justifie(self, annee_scolaire:str, trimestre:str) -> int:
+        return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["heures_absence_justifie"]
+    
+    def get_nb_absences_non_justifie(self, annee_scolaire:str, trimestre:str) -> int:
+        return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["heures_absence_non_justifie"]
+
+    def get_nb_retards(self, annee_scolaire:str, trimestre:str) -> int:
+        return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["total_retards"]
 
     def matiere_existe(self, annee_scolaire:str, trimestre:str, matiere:str) -> bool:
         """Permet de savoir si la matière existe au trimestre de l'année sélectionné
