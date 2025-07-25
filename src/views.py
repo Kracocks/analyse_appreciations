@@ -1,5 +1,5 @@
 from .app import app, db, modeles_disponibles
-from .models import Graphique, ModeleForm, ModeleDB, get_last_modele_id, get_modeles, get_modele_from_nom, get_labels_of_model
+from .models import Graphique, ModeleForm, ModeleDB, get_last_modele_id, get_modeles, get_modele, get_labels_of_model
 from flask import render_template,redirect, url_for, Response, request, stream_with_context, jsonify
 from transformers import pipeline
 import os
@@ -117,7 +117,7 @@ def correler_modele():
     for i in range(len(modeles_disponibles)):
         if modeles_disponibles[i].correlation == None:
             correlation = modeles_disponibles[i].noter()
-            modele = get_modele_from_nom(modeles_disponibles[i].nom)
+            modele = get_modele(modeles_disponibles[i].id)
             modele.correlation = correlation
             db.session.add(modele)
             modeles_disponibles[i] = modele
