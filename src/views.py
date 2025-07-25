@@ -1,6 +1,6 @@
 from .app import app, db, modeles_disponibles
-from .models import Graphique, ModeleForm, ModeleDB, get_last_modele_id, get_modeles, get_modele_from_nom
-from flask import render_template,redirect, url_for, Response, request, stream_with_context
+from .models import Graphique, ModeleForm, ModeleDB, get_last_modele_id, get_modeles, get_modele_from_nom, get_labels_of_model
+from flask import render_template,redirect, url_for, Response, request, stream_with_context, jsonify
 from transformers import pipeline
 import os
 from werkzeug.utils import secure_filename
@@ -19,7 +19,6 @@ def index():
     fichiers_recents = [f for f in os.listdir(app.config["UPLOAD_PATH"]) if os.path.isfile(os.path.join(app.config["UPLOAD_PATH"], f))]
     filename = graphique.donnees.fichier
     modeles_disponibles = get_modeles()
-    print(modeles_disponibles)
     modele_selectionne = graphique.modele_choisi.nom if graphique.modele_choisi.nom != None else modeles_disponibles[0].nom
 
     if request.method == 'POST':
@@ -31,6 +30,7 @@ def index():
             graphique.modifier_donnees(os.path.join(app.config["UPLOAD_PATH"], filename))
 
     f=ModeleForm()
+    #f.label_positif.choices = "-- Choisir un label --" + get_labels_of_model(f.nom.data)
 
     return render_template("index.html",
                            fichier_charge=filename,
@@ -70,14 +70,15 @@ def get_graph():
 def save_modele():
     modele = None
     f = ModeleForm()
+    f.label_positif.choices = [(label, label) for label in get_labels_of_model(f.nom.data)]
     if f.validate_on_submit():
         id = get_last_modele_id() + 1
         modele = ModeleDB(id=id, nom=f.nom.data, correlation=None, label_positif=f.label_positif.data)
-        modele.pipeline = pipeline("text-classification", model="ac0hik/Sentiment_Analysis_French", top_k=None)
         db.session.add(modele)
         db.session.commit()
 
         return redirect(url_for("index"))
+
     fichiers_recents = [f for f in os.listdir(app.config["UPLOAD_PATH"]) if os.path.isfile(os.path.join(app.config["UPLOAD_PATH"], f))]
     filename = graphique.donnees.fichier
     modeles_disponibles = get_modeles()
@@ -124,3 +125,7 @@ def correler_modele():
     db.session.commit()
 
     return redirect(url_for("index"))
+
+@app.route("/get/labels/<string:nom_auteur>/<string:nom_modele>", methods=["GET", "POST"])
+def get_labels(nom_auteur:str, nom_modele:str):
+    return jsonify(list(get_labels_of_model(nom_auteur + "/" + nom_modele)))

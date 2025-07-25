@@ -9,7 +9,7 @@ from datasets import load_dataset
 import time
 import textwrap
 from flask_wtf import FlaskForm
-from wtforms import HiddenField, StringField
+from wtforms import HiddenField, StringField, SelectField
 from wtforms.validators import DataRequired, ValidationError
 from .constantes import COULEURS, MOT_MOYENNES, MOT_APPRECIATIONS
 
@@ -620,9 +620,17 @@ def valider_label_positif_modele(form, field):
 
 # Formulaires
 class ModeleForm(FlaskForm):
-    id = HiddenField("id")
-    nom = StringField("Nom du modèle provenant de HuggingFace", validators=[DataRequired()])
-    label_positif = StringField("Nom du label positif du modèle", validators=[DataRequired(), valider_label_positif_modele])
+    id = HiddenField('id')
+    nom = StringField("Nom du modèle provenant de HuggingFace", validators=[DataRequired()], id='field_nom')
+    label_positif = SelectField('Nom du label positif du modèle:', validators=[DataRequired()], id='select_label')
+
+def get_labels_of_model(nom:str) -> list[str]:
+    from transformers import AutoModelForSequenceClassification
+    if repo_exists(nom):
+        modele = AutoModelForSequenceClassification.from_pretrained(nom)
+        return modele.config.label2id.keys()
+    else:
+        return ["-- Aucun modèle sélectionné --"]
 
 def get_modeles():
     return ModeleDB.query.all()

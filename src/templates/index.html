@@ -32,8 +32,6 @@
                 is_fichier_charge = "{{ fichier_charge | safe }}" != "" && "{{ fichier_charge | safe }}" != "None"
                 temp = is_fichier_charge ? "Fichier chargé : {{ fichier_charge | safe }}" : "Aucun fichier chargé"
                 dropzone_message = dropzone_message + temp
-
-                console.log(is_fichier_charge)
             </script>
 
             <!-- affichage de la dropzone-->
@@ -112,10 +110,59 @@
                 </ul>
                 {% endif%}
 
+                <script charset="utf-8" type="text/javascript">
+
+                $(function() {
+                    var dropdown = {
+                        nom: $('#field_nom'),
+                        label: $('#select_label')
+                    };
+
+                    // call to update on load
+                    updateLabel();
+
+                    // function to call XHR and update label dropdown
+                    function updateLabel() {
+                        dropdown.label.attr('disabled', 'disabled');
+                        dropdown.label.empty();
+
+                        var modele = dropdown.nom.val().includes("/") ? dropdown.nom.val() : "a/a";
+
+                        var url = `/get/labels/${modele}`
+                        console.log(url)
+
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(labels => {
+                                labels.forEach(label => {
+                                    dropdown.label.append(
+                                        $('<option>', {
+                                            value: label,
+                                            text: label
+                                        })
+                                    );
+                                });
+                                dropdown.label.removeAttr('disabled');
+                            })
+                            .catch(error => {
+                                console.log("Erreur durant le fetch : ", error);
+                            });
+                    }
+
+                    // event listener to nom dropdown change
+                    dropdown.nom.on('change', function() {
+                        updateLabel();
+                    });
+
+                });
+
+                </script>
+
+
                 <div class={% if form.label_positif.errors %}"form-group has-error"{% else %}"form-group"{% endif %}>
                     {{ form.label_positif.label }}
                     <div>
-                        {{ form.label_positif(size=50, class_="form-control") }}
+                        {{ form.label_positif(class_="form-control") }}
                     </div>
                 </div>
 
