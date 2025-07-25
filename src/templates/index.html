@@ -76,7 +76,7 @@
                     <label for="modeles_choice">Modèle : </label>
                     <select name="modeles_choice" id="modeles_choice">
                         {% for modele in modeles_disponibles %}
-                        <option value="{{ modele.nom }}" {% if modele.nom==modele_selectionne %}selected{% endif %}>{{ modele.nom }} ; corrélation : {{ modele.correlation }}</option>
+                        <option value="{{ modele.id }}" {% if modele.id==modele_selectionne.id %}selected{% endif %}>{{ modele.nom }} ; corrélation : {{ modele.correlation }}</option>
                         {% endfor %}
                     </select>
                 </form>

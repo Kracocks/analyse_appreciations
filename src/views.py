@@ -12,14 +12,14 @@ graphique = Graphique()
 
 with app.app_context():
     if sys.argv[1] == "run":
-        graphique.modifier_modele("Peed911/french_sentiment_analysis")
+        graphique.modifier_modele(1)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     fichiers_recents = [f for f in os.listdir(app.config["UPLOAD_PATH"]) if os.path.isfile(os.path.join(app.config["UPLOAD_PATH"], f))]
     filename = graphique.donnees.fichier
     modeles_disponibles = get_modeles()
-    modele_selectionne = graphique.modele_choisi.nom if graphique.modele_choisi.nom != None else modeles_disponibles[0].nom
+    modele_selectionne = graphique.modele_choisi if graphique.modele_choisi != None else modeles_disponibles[0]
 
     if request.method == 'POST':
         file = request.files.get('file')
@@ -30,7 +30,6 @@ def index():
             graphique.modifier_donnees(os.path.join(app.config["UPLOAD_PATH"], filename))
 
     f=ModeleForm()
-    #f.label_positif.choices = "-- Choisir un label --" + get_labels_of_model(f.nom.data)
 
     return render_template("index.html",
                            fichier_charge=filename,
@@ -82,7 +81,7 @@ def save_modele():
     fichiers_recents = [f for f in os.listdir(app.config["UPLOAD_PATH"]) if os.path.isfile(os.path.join(app.config["UPLOAD_PATH"], f))]
     filename = graphique.donnees.fichier
     modeles_disponibles = get_modeles()
-    modele_selectionne = graphique.modele_choisi.nom if graphique.modele_choisi.nom != None else modeles_disponibles[0].nom
+    modele_selectionne = graphique.modele_choisi if graphique.modele_choisi != None else modeles_disponibles[0]
     return render_template("index.html",
                            fichier_charge=filename,
                            modeles_disponibles=modeles_disponibles,

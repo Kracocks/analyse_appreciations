@@ -29,14 +29,13 @@ class Graphique:
         """
         self.donnees.modfier_fichier(fichier)
 
-    def modifier_modele(self, modele:str):
+    def modifier_modele(self, id_modele:int):
         """Modifier le modèle d'IA utilisé pour donner un score au appréciations
 
         Args:
             modele (str): Le nouveau modèle d'IA
         """
-        self.modele_choisi = get_modele_from_nom(modele)
-        
+        self.modele_choisi = get_modele(id_modele)
 
     def generer(self) -> str:
         """Génère un graphique à partir des données, variables et modèle d'IA
