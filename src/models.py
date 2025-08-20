@@ -21,7 +21,7 @@ class Graphique:
         self.modele_choisi = ModeleDB()
         self.chargement = Chargement()
 
-    def modifier_donnees(self, fichier:str):
+    def modifier_donnees(self, fichier:str) -> None:
         """Modifier le fichier utilisé pour afficher les données dans un graphique. Le fichier doit être un fichier JSON qui doit respecter une architecture.
 
         Args:
@@ -29,7 +29,7 @@ class Graphique:
         """
         self.donnees.modfier_fichier(fichier)
 
-    def modifier_modele(self, id_modele:int):
+    def modifier_modele(self, id_modele:int) -> None:
         """Modifier le modèle d'IA utilisé pour donner un score au appréciations
 
         Args:
@@ -293,7 +293,15 @@ class Graphique:
 
         return graphJSON
 
-    def wrap(self, text):
+    def wrap(self, text:str) -> str:
+        """Met un texte en plusieurs lignes de 32 caractères en utilisant les balises <br> html
+
+        Args:
+            text (str): Le texte à mettre en plusieurs lignes
+
+        Returns:
+            str: Le texte mis en plusieurs lignes
+        """
         if (text == None):
             return None
         wrap = textwrap.wrap(text, width=32)
@@ -331,6 +339,8 @@ class Donnees:
                 data = json.load(file)
                 if (self.verifier_contenu(data)):
                     self.donnees = data
+                    return True
+        return False
             
     def verifier_contenu(self, donnee:any) -> bool:
         """Vérifie si l'architecture du JSON correspond à celui attendu par l'application
@@ -344,7 +354,7 @@ class Donnees:
         # TODO Faire la vérification du contenu du fichier
         return True
     
-    def modifier_eleve(self, ine_eleve:str):
+    def modifier_eleve(self, ine_eleve:str) -> None:
         """Modifie les données utilisé
 
         Args:
@@ -359,7 +369,7 @@ class Donnees:
                     eleve_selectionne = {"nom": eleve["nom"], "prenom": eleve["prenom"], "INE": eleve["INE"]}
                     self.eleve_selectionne = eleve_selectionne
 
-    def get_eleves(self):
+    def get_eleves(self) -> None:
         """Permet d'avoir tout les élèves qui se trouve dans les données
         """
         res = []
@@ -368,7 +378,7 @@ class Donnees:
                 res.append({"nom": eleve["nom"], "prenom": eleve["prenom"], "INE": eleve["INE"]})
         return res
     
-    def get_nom_eleve(self):
+    def get_nom_eleve(self) -> None:
         return (self.donnees_eleve.get("prenom") + " " + self.donnees_eleve.get("nom"))
 
     def get_annees_scolaire(self) -> list[str]:
@@ -451,12 +461,39 @@ class Donnees:
         return res
 
     def get_nb_absences_justifie(self, annee_scolaire:str, trimestre:str) -> int:
+        """Renvoie le nombre d'absence justifiée de l'élève sélectionné sur un trimestre choisi
+
+        Args:
+            annee_scolaire (str): L'années scolaire
+            trimestre (str): Le trimestre
+
+        Returns:
+            int: Le nombre d'absence justifiée sur un trimestre choisi
+        """
         return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["heures_absence_justifie"]
     
     def get_nb_absences_non_justifie(self, annee_scolaire:str, trimestre:str) -> int:
+        """Renvoie le nombre d'absence non justifiée de l'élève sélectionné sur un trimestre choisi
+
+        Args:
+            annee_scolaire (str): L'années scolaire
+            trimestre (str): Le trimestre
+
+        Returns:
+            int: Le nombre d'absence non justifiée sur un trimestre choisi
+        """
         return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["heures_absence_non_justifie"]
 
     def get_nb_retards(self, annee_scolaire:str, trimestre:str) -> int:
+        """Renvoie le nombre de retards de l'élève sélectionné sur un trimestre choisi
+
+        Args:
+            annee_scolaire (str): L'années scolaire
+            trimestre (str): Le trimestre
+
+        Returns:
+            int: Le nombre de retard sur un trimestre choisi
+        """
         return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["total_retards"]
 
     def matiere_existe(self, annee_scolaire:str, trimestre:str, matiere:str) -> bool:
@@ -473,6 +510,11 @@ class Donnees:
         return matiere in self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"].keys()
 
     def get_nb_total_donnees(self) -> int:
+        """Renvoie le nombre de données total sur l'élève sélectionné
+
+        Returns:
+            int: Le nombre de données total
+        """
         total = 0
         for annee_scolaire in self.donnees_eleve["annees_scolaire"]:
             for trimestre in self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"]:
