@@ -309,10 +309,10 @@ class Donnees:
         Args:
             fichier (str): Le fichier à charger
         """
-        self.fichier = None
-        self.donnees = None
-        self.eleve_selectionne = None
-        self.donnees_eleve = None
+        self.fichier:str = None
+        self.donnees:dict[str, any] = None
+        self.eleve_selectionne:dict[str, str] = None
+        self.donnees_eleve:dict[str, any] = None
 
     def modfier_fichier(self, new_fichier:str) -> bool:
         """Modifier les donnée utilisé par l'application à partir d'un fichier JSON. Le JSON doit respecter une architecture et renverra False si l'architecture n'est pas correcte ou si le fichier n'est pas un JSON
@@ -471,42 +471,6 @@ class Donnees:
             bool: Return True si la matière existe dans le trimestre de l'année scolaire choisi sinon return False
         """
         return matiere in self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"].keys()
-
-    def score_existe(self, annee_scolaire:str, trimestre:str, modele_ia:str, matiere:str = None) -> bool:
-        """Permet de savoir si le score d'une appréciation à déjà été calculé
-
-        Args:
-            annee_scolaire (str): L'année scolaire choisi
-            trimestre (str): Le trimestre de l'année scolaire choisi
-            modele_ia (str): Le modèle d'ia utilisé pour calculer le score
-            matiere (str, optional): La matière sélectionné. Si aucune, prendre l'appréciation générale. none par défault.
-
-        Returns:
-            bool: Retourne True si le score calculé par l'ia choisi existe, Sinon False
-        """
-        if matiere:
-            return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere].get("appreciation_score_" + modele_ia) != None
-        else:
-            return self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre].get("appreciation_generale_score_" + modele_ia) != None
-
-    def set_score_appreciation(self, annee_scolaire:str, trimestre:str, modele_ia:str, score:float, matiere:str = None):
-        """Ajoute le score dans le JSON
-
-        Args:
-            annee_scolaire (str): L'année scolaire choisi
-            trimestre (str): Le trimestre de l'année scolaire choisi
-            modele_ia (str): Le modèle d'ia utilisé pour calculer le score
-            score (float): Le score à mettre dans le JSON
-            matiere (str, optional): La matière sélectionné. Si aucune, prendre l'appréciation générale. none par défault.
-        """
-        if matiere:
-            self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["matiere"][matiere]["appreciation_score_" + modele_ia] = score
-        else:
-            self.donnees_eleve["annees_scolaire"][annee_scolaire]["trimestres"][trimestre]["appreciation_generale_score_" + modele_ia] = score
-        with open(self.fichier, 'r+') as f:
-            f.seek(0)
-            json.dump(self.donnees_eleve, f, indent=4)
-            f.truncate()
 
     def get_nb_total_donnees(self) -> int:
         total = 0
