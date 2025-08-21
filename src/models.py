@@ -43,9 +43,6 @@ class Graphique:
         Returns:
             str: Le graphique généré
         """
-        start_time = time.time()
-
-        # Récupération des données
         self.chargement.to_start()
         
         # Chargement du modèle si pas chargé
@@ -58,6 +55,7 @@ class Graphique:
         
         nb_total_donnees = self.donnees.get_nb_total_donnees()
 
+        # Récupération des données
         annees_scolaire = self.donnees.get_annees_scolaire()
         matieres = self.donnees.get_all_matieres()
         trimestres = []
@@ -118,8 +116,6 @@ class Graphique:
                 resultats["absences non justifiées"].append(absence_non_just)
                 self.chargement.update_progression(1 * 80 / nb_total_donnees)
 
-                print(self.chargement.progression)
-
         # Récupération des scores
         for resultat in resultats.keys():
             if resultat.startswith(MOT_APPRECIATIONS):
@@ -143,10 +139,6 @@ class Graphique:
                         j += 1
 
                 resultats["appréciations " + nom]["scores"] = result
-
-        end_time = time.time()
-
-        print("TIME : ", end_time-start_time)
 
         # Création du graphique
         self.chargement.status = "Création du graphique"
