@@ -549,18 +549,15 @@ class Chargement:
     def __init__(self):
         self.temp_prog = 0
         self.progression = 0
-        self.est_fini = False
         self.status = ""
     
     def to_start(self):
         self.temp_prog = 0
         self.progression = 0
-        self.est_fini = False
         
     def to_end(self):
         self.temp_prog = 100
         self.progression = 100
-        self.est_fini = True
         
     def update_progression(self, added_progression):
         self.temp_prog += added_progression
