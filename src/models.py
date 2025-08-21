@@ -6,7 +6,6 @@ import pandas as pd
 from huggingface_hub import repo_exists
 from transformers import pipeline
 from datasets import load_dataset
-import time
 import textwrap
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, StringField, SelectField
@@ -46,101 +45,29 @@ class Graphique:
         self.chargement.to_start()
         
         # Chargement du modèle si pas chargé
-        self.chargement.status = "Chargement du modèle d'IA choisi"
-        if self.modele_choisi.pipeline == None:
-            self.modele_choisi.pipeline = pipeline("text-classification", model=self.modele_choisi.nom, top_k=None) 
-        self.chargement.update_progression(5)
+        self._charger_modele()
 
-        self.chargement.status = "Récupération des données"
-        
-        nb_total_donnees = self.donnees.get_nb_total_donnees()
-
-        # Récupération des données
-        annees_scolaire = self.donnees.get_annees_scolaire()
-        matieres = self.donnees.get_all_matieres()
-        trimestres = []
-        resultats = dict()
-        for annee_scolaire in annees_scolaire:
-            for trimestre in self.donnees.get_trimestres(annee_scolaire):
-                trimestres.append(trimestre + " année " + annee_scolaire)
-
-                # Obtenir les moyennes générales
-                if resultats.get("moyennes générales") == None:
-                    resultats["moyennes générales"] = []
-                mg = self.donnees.get_moyenne(annee_scolaire, trimestre)
-                resultats["moyennes générales"].append(mg)
-                self.chargement.update_progression(1 * 80 / nb_total_donnees)
-
-                # Obtenir les appréciations générales
-                appreciation = self.donnees.get_appreciation(annee_scolaire, trimestre)
-                if resultats.get("appréciations générales") == None:
-                    resultats["appréciations générales"] = {"textes": [], "scores": []}
-                resultats["appréciations générales"]["textes"].append(appreciation)
-                self.chargement.update_progression(1 * 80 / nb_total_donnees)
-
-                for matiere in matieres:
-                    # Obtenir les moyennes de la matière
-                    if resultats.get(MOT_MOYENNES + matiere) == None:
-                        resultats[MOT_MOYENNES + matiere] = []
-                    moyenne = self.donnees.get_moyenne(annee_scolaire, trimestre, matiere) if self.donnees.matiere_existe(annee_scolaire, trimestre, matiere) else None
-                    resultats[MOT_MOYENNES + matiere].append(moyenne)
-                    
-                    self.chargement.update_progression(1 * 80 / nb_total_donnees)
-
-                    # Obtenir les appréciations de la matière
-                    if resultats.get(MOT_APPRECIATIONS + matiere) == None:
-                        resultats[MOT_APPRECIATIONS + matiere] = {"textes": [], "scores": []}
-                    appreciation = self.donnees.get_appreciation(annee_scolaire, trimestre, matiere) if self.donnees.matiere_existe(annee_scolaire, trimestre, matiere) else None
-                    resultats[MOT_APPRECIATIONS + matiere]["textes"].append(appreciation)
-                    
-                    self.chargement.update_progression(1 * 80 / nb_total_donnees)
-
-                # Obtenir les retards
-                retard = self.donnees.get_nb_retards(annee_scolaire, trimestre)
-                if resultats.get("retard") == None:
-                    resultats["retard"] = []
-                resultats["retard"].append(retard)
-                self.chargement.update_progression(1 * 80 / nb_total_donnees)
-
-                # Obtenir les absences justifiées
-                absence_just = self.donnees.get_nb_absences_justifie(annee_scolaire, trimestre)
-                if resultats.get("absences justifiées") == None:
-                    resultats["absences justifiées"] = []
-                resultats["absences justifiées"].append(absence_just)
-                self.chargement.update_progression(1 * 80 / nb_total_donnees)
-
-                # Obtenir les absences non justifiées
-                absence_non_just = self.donnees.get_nb_absences_non_justifie(annee_scolaire, trimestre)
-                if resultats.get("absences non justifiées") == None:
-                    resultats["absences non justifiées"] = []
-                resultats["absences non justifiées"].append(absence_non_just)
-                self.chargement.update_progression(1 * 80 / nb_total_donnees)
-
-        # Récupération des scores
-        for resultat in resultats.keys():
-            if resultat.startswith(MOT_APPRECIATIONS):
-                nom = resultat[len(MOT_APPRECIATIONS):]
-
-                # On récupère les textes pour les analyser et les mettres dans scores
-                vals_existes = [] # Les valeurs qui ne sont pas à None
-                ind_val_existe = [] # L'indice des valeurs qui ne sont pas à None
-                result = [None] * len(resultats[resultat]["textes"]) # Ce qui va être utilisé pour afficher le graphique
-                for i in range(len(resultats[resultat]["textes"])):
-                    if resultats[resultat]["textes"][i] != None:
-                        ind_val_existe.append(i)
-                        vals_existes.append(resultats[resultat]["textes"][i])
-                scores = self.modele_choisi.analyser(vals_existes)
-
-                # Mettre les données manquante dans la liste
-                j = 0
-                for i in range(len(result)):
-                    if i in ind_val_existe:
-                        result[i] = scores[j]
-                        j += 1
-
-                resultats["appréciations " + nom]["scores"] = result
+        trimestres, resultats = self._recuperer_donnees()
 
         # Création du graphique
+        data = self._creer_graphique(trimestres, resultats)
+
+        graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+
+        self.chargement.to_end()
+
+        return graphJSON
+
+    def _creer_graphique(self, trimestres:list, resultats:dict) -> go.Figure:
+        """Creer le graphique
+
+        Args:
+            trimestres (list): Les trimestre
+            resultats (dict): Les données
+
+        Returns:
+            go.Figure: Le graphique créé
+        """
         self.chargement.status = "Création du graphique"
 
         data = go.Figure(layout_yaxis_range=[0,20])
@@ -278,12 +205,112 @@ class Graphique:
                                 bgcolor=couleur,
                                 opacity=0.8
                             )
+                            
+        return data
 
-        graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+    def _recuperer_donnees(self) -> tuple[list, dict]:
+        """Récupère les données de l'élève sélectionné
 
-        self.chargement.to_end()
+        Returns:
+            tuple[list, dict]: Les données récupéré
+        """
+        self.chargement.status = "Récupération des données"
+        
+        nb_total_donnees = self.donnees.get_nb_total_donnees()
 
-        return graphJSON
+        # Récupération des données
+        annees_scolaire = self.donnees.get_annees_scolaire()
+        matieres = self.donnees.get_all_matieres()
+        trimestres = []
+        resultats = dict()
+        for annee_scolaire in annees_scolaire:
+            for trimestre in self.donnees.get_trimestres(annee_scolaire):
+                trimestres.append(trimestre + " année " + annee_scolaire)
+
+                # Obtenir les moyennes générales
+                if resultats.get("moyennes générales") == None:
+                    resultats["moyennes générales"] = []
+                mg = self.donnees.get_moyenne(annee_scolaire, trimestre)
+                resultats["moyennes générales"].append(mg)
+                self.chargement.update_progression(1 * 80 / nb_total_donnees)
+
+                # Obtenir les appréciations générales
+                appreciation = self.donnees.get_appreciation(annee_scolaire, trimestre)
+                if resultats.get("appréciations générales") == None:
+                    resultats["appréciations générales"] = {"textes": [], "scores": []}
+                resultats["appréciations générales"]["textes"].append(appreciation)
+                self.chargement.update_progression(1 * 80 / nb_total_donnees)
+
+                for matiere in matieres:
+                    # Obtenir les moyennes de la matière
+                    if resultats.get(MOT_MOYENNES + matiere) == None:
+                        resultats[MOT_MOYENNES + matiere] = []
+                    moyenne = self.donnees.get_moyenne(annee_scolaire, trimestre, matiere) if self.donnees.matiere_existe(annee_scolaire, trimestre, matiere) else None
+                    resultats[MOT_MOYENNES + matiere].append(moyenne)
+                    
+                    self.chargement.update_progression(1 * 80 / nb_total_donnees)
+
+                    # Obtenir les appréciations de la matière
+                    if resultats.get(MOT_APPRECIATIONS + matiere) == None:
+                        resultats[MOT_APPRECIATIONS + matiere] = {"textes": [], "scores": []}
+                    appreciation = self.donnees.get_appreciation(annee_scolaire, trimestre, matiere) if self.donnees.matiere_existe(annee_scolaire, trimestre, matiere) else None
+                    resultats[MOT_APPRECIATIONS + matiere]["textes"].append(appreciation)
+                    
+                    self.chargement.update_progression(1 * 80 / nb_total_donnees)
+
+                # Obtenir les retards
+                retard = self.donnees.get_nb_retards(annee_scolaire, trimestre)
+                if resultats.get("retard") == None:
+                    resultats["retard"] = []
+                resultats["retard"].append(retard)
+                self.chargement.update_progression(1 * 80 / nb_total_donnees)
+
+                # Obtenir les absences justifiées
+                absence_just = self.donnees.get_nb_absences_justifie(annee_scolaire, trimestre)
+                if resultats.get("absences justifiées") == None:
+                    resultats["absences justifiées"] = []
+                resultats["absences justifiées"].append(absence_just)
+                self.chargement.update_progression(1 * 80 / nb_total_donnees)
+
+                # Obtenir les absences non justifiées
+                absence_non_just = self.donnees.get_nb_absences_non_justifie(annee_scolaire, trimestre)
+                if resultats.get("absences non justifiées") == None:
+                    resultats["absences non justifiées"] = []
+                resultats["absences non justifiées"].append(absence_non_just)
+                self.chargement.update_progression(1 * 80 / nb_total_donnees)
+
+        # Récupération des scores
+        for resultat in resultats.keys():
+            if resultat.startswith(MOT_APPRECIATIONS):
+                nom = resultat[len(MOT_APPRECIATIONS):]
+
+                # On récupère les textes pour les analyser et les mettres dans scores
+                vals_existes = [] # Les valeurs qui ne sont pas à None
+                ind_val_existe = [] # L'indice des valeurs qui ne sont pas à None
+                result = [None] * len(resultats[resultat]["textes"]) # Ce qui va être utilisé pour afficher le graphique
+                for i in range(len(resultats[resultat]["textes"])):
+                    if resultats[resultat]["textes"][i] != None:
+                        ind_val_existe.append(i)
+                        vals_existes.append(resultats[resultat]["textes"][i])
+                scores = self.modele_choisi.analyser(vals_existes)
+
+                # Mettre les données manquante dans la liste
+                j = 0
+                for i in range(len(result)):
+                    if i in ind_val_existe:
+                        result[i] = scores[j]
+                        j += 1
+
+                resultats["appréciations " + nom]["scores"] = result
+        return trimestres,resultats
+
+    def _charger_modele(self) -> None:
+        """Charge le modèle si il n'a pas déjà été chargé
+        """
+        self.chargement.status = "Chargement du modèle d'IA choisi"
+        if self.modele_choisi.pipeline == None:
+            self.modele_choisi.pipeline = pipeline("text-classification", model=self.modele_choisi.nom, top_k=None) 
+        self.chargement.update_progression(5)
 
     def wrap(self, text:str) -> str:
         """Met un texte en plusieurs lignes de 32 caractères en utilisant les balises <br> html
